@@ -1,0 +1,7 @@
+Metadata-Version: 2.4
+Name: mg-platform
+Version: 0.1.0
+Requires-Dist: fastapi
+Requires-Dist: uvicorn
+Requires-Dist: python-dotenv
+Dynamic: requires-dist

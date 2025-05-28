@@ -1,114 +1,130 @@
-from fastapi import FastAPI, Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from mcp.server import MCPServer, Tool, Arg, String, Integer
-from tools.sql import run_sql
-from tools.scraper import launch_scraper
-from tools.kpi import get_indicator, forecast_kpi
-from datetime import timedelta
-from auth import User, authenticate_user, create_access_token, get_current_user, check_permission
-from pydantic import BaseModel
-from typing import Dict
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
+import os
+from dotenv import load_dotenv
+from datetime import datetime
 
-# Modèle pour la réponse de token
-class Token(BaseModel):
-    access_token: str
-    token_type: str
+# Charger les variables d'environnement
+load_dotenv()
 
-app = FastAPI(title="MG Data MCP")
-
-# Configuration OAuth2 pour l'authentification par token
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-server = MCPServer(
-    name="mg-data-mcp",
-    description="Outils pour le pipeline Marne & Gondoire",
-    version="0.1.0"
+# Configuration de l'application
+app = FastAPI(
+    title="MG Data MCP Server",
+    description="Serveur MCP pour la plateforme Marne & Gondoire",
+    version="0.1.0",
+    docs_url="/docs",
+    redoc_url="/redoc"
 )
 
-server.add_tool(
-    Tool(
-        name="run_sql",
-        description="Exécute une requête SQL en lecture seule sur la base de données analytique",
-        args=[Arg("query", String())],
-        func=run_sql,
-        permissions=["viewer", "editor"]
-    )
+# Configuration CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # À restreindre en production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-server.add_tool(
-    Tool(
-        name="launch_scraper",
-        description="Lance un spider Scrapy ou Playwright par nom",
-        args=[Arg("spider", String()), Arg("url", String())],
-        func=launch_scraper,
-        permissions=["editor"]
-    )
-)
-
-server.add_tool(
-    Tool(
-        name="get_indicator",
-        description="Retourne la valeur d'un KPI pour une date donnée",
-        args=[Arg("name", String()), Arg("date", String())],
-        func=get_indicator,
-        permissions=["viewer"]
-    )
-)
-
-server.add_tool(
-    Tool(
-        name="forecast_kpi",
-        description="Retourne une prévision pour un KPI donné",
-        args=[Arg("name", String()), Arg("horizon", Integer())],
-        func=forecast_kpi,
-        permissions=["viewer"]
-    )
-)
-
-app.mount("/mcp", server.as_fastapi())
-
-# Endpoint pour l'authentification et la génération de tokens
-@app.post("/token", response_model=Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
-    """
-    Endpoint pour s'authentifier et obtenir un token JWT
-    """
-    user = authenticate_user(form_data.username, form_data.password)
-    
-    if not user:
-        raise HTTPException(
-            status_code=401,
-            detail="Nom d'utilisateur ou mot de passe incorrect",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-        
-    access_token = create_access_token(
-        data={"sub": user.username}
-    )
-    
-    return {"access_token": access_token, "token_type": "bearer"}
-
-# Endpoint pour vérifier le token et obtenir les informations de l'utilisateur
-@app.get("/users/me", response_model=User)
-async def read_users_me(current_user: User = Depends(get_current_user)):
-    """
-    Endpoint pour obtenir les informations de l'utilisateur courant
-    """
-    return current_user
-
-# Endpoint pour la documentation du serveur MCP
+# Routes principales
 @app.get("/")
 async def root():
-    """
-    Page d'accueil du serveur MCP
-    """
+    """Point d'entrée principal du serveur"""
     return {
-        "name": "Marne & Gondoire MCP Server",
+        "message": "Serveur MCP Marne & Gondoire",
         "version": "0.1.0",
-        "docs_url": "/docs",
-        "mcp_endpoint": "/mcp"
+        "status": "running",
+        "timestamp": datetime.now().isoformat(),
+        "project": "Marne & Gondoire"
     }
 
+@app.get("/health")
+async def health_check():
+    """Vérification de l'état du serveur"""
+    return {
+        "status": "healthy",
+        "service": "mg-data-mcp",
+        "uptime": "running",
+        "components": {
+            "server": "✅ Actif",
+            "database": "⏳ Non configuré",
+            "tools": "✅ Basiques disponibles"
+        }
+    }
+
+@app.get("/info")
+async def project_info():
+    """Informations détaillées sur le projet"""
+    return {
+        "project": "Marne & Gondoire", 
+        "description": "Plateforme d'analyse de données avec agents IA",
+        "version": "0.1.0",
+        "capabilities": [
+            "API REST FastAPI",
+            "Health monitoring", 
+            "Documentation automatique",
+            "Outils de base"
+        ],
+        "status": "en développement",
+        "endpoints": {
+            "root": "/",
+            "health": "/health", 
+            "info": "/info",
+            "docs": "/docs",
+            "redoc": "/redoc"
+        }
+    }
+
+@app.get("/tools")
+async def list_tools():
+    """Liste les outils disponibles"""
+    try:
+        from mcp_server.tools.basic import list_available_tools
+        tools = list_available_tools()
+        return {
+            "tools": tools,
+            "count": len(tools),
+            "status": "loaded"
+        }
+    except ImportError:
+        return {
+            "tools": [],
+            "count": 0,
+            "status": "error",
+            "message": "Impossible de charger les outils"
+        }
+
+@app.get("/status")
+async def project_status():
+    """Statut détaillé du projet"""
+    try:
+        from mcp_server.tools.basic import get_project_status
+        status = get_project_status()
+        return status
+    except ImportError:
+        return {
+            "project_name": "Marne & Gondoire",
+            "version": "0.1.0", 
+            "status": "erreur de configuration",
+            "error": "Impossible de charger les outils de statut"
+        }
+
+# Point d'entrée pour lancer le serveur directement
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    # Configuration depuis les variables d'environnement
+    port = int(os.getenv("SERVER_PORT", 8080))
+    host = os.getenv("SERVER_HOST", "localhost")
+    debug = os.getenv("DEBUG", "true").lower() == "true"
+    
+    print(f"🚀 Démarrage du serveur MCP Marne & Gondoire")
+    print(f"📍 Adresse: http://{host}:{port}")
+    print(f"📚 Documentation: http://{host}:{port}/docs")
+    print(f"🔍 Health check: http://{host}:{port}/health")
+    
+    uvicorn.run(
+        "mcp_server.main:app",  # Référence correcte au module
+        host=host,
+        port=port,
+        reload=debug,
+        log_level="info" if debug else "warning"
+    )

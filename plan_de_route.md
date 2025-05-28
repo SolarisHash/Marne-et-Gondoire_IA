@@ -127,6 +127,62 @@ uvicorn mcp_server.main:app --reload --port 8080
 
 ---
 
+Bien sûr ! Voici ton plan de route **enrichi** avec les étapes demandées, dans un style cohérent avec le reste du document. Je t’intègre le bloc directement après la section “Implémentation des Outils”, là où il s’intègre le plus naturellement.
+
+---
+
+## 🛠️ Implémentation des Outils
+
+*... (sections existantes inchangées)*
+
+---
+
+## 🔍 Analyse et Enrichissement des Fichiers de Données
+
+### 1. Analyse des fichiers pour identifier les informations manquantes
+
+Ajouter un outil (par exemple, `tools/analyze_files.py`) permettant de traiter différents formats de fichiers (`Excel`, `JSON`, CSV, etc.) pour :
+
+* Parcourir les données,
+* Repérer les champs ou valeurs manquants,
+* Générer un rapport synthétique sur les données incomplètes.
+
+### 2. Recherche et collecte d’informations manquantes par scraping web
+
+Développer une fonction (exemple : `tools/fill_missing_data.py`) qui :
+
+* Prend la liste des informations manquantes détectées,
+* Utilise des spiders Scrapy/Playwright ou des APIs publiques pour effectuer une recherche ciblée,
+* Collecte et vérifie les données récupérées.
+
+### 3. Génération d’un fichier enrichi
+
+Mettre en place un outil qui :
+
+* Fusionne les informations collectées avec le fichier source,
+* Produit un nouveau fichier de données enrichi (Excel, JSON, etc.) et documente les modifications,
+* Permet de télécharger ou d’archiver ce nouveau fichier enrichi pour intégration dans le pipeline.
+
+#### Exemple de structure possible pour l’outil :
+
+```python
+def analyze_and_enrich_file(file_path: str) -> dict:
+    missing_info = analyze_file_for_missing_data(file_path)
+    found_data = scrape_missing_info(missing_info)
+    enriched_file = merge_data(file_path, found_data)
+    return {"enriched_file": enriched_file, "missing_report": missing_info}
+```
+
+---
+
+**Tu pourras ainsi, pour chaque jeu de données, automatiser la complétion et fiabiliser la collecte !**
+
+Dis-moi si tu veux que j’intègre l’exemple de code détaillé ou que je te rédige un README spécifique pour cette nouvelle brique logicielle !
+
+
+
+
+
 ## 🛠️ Implémentation des Outils
 
 ### 1. Exécution de requêtes SQL (`tools/sql.py`)
@@ -229,7 +285,4 @@ print(chat("run_sql: SELECT COUNT(*) FROM fact_permis"))
 * [Tutoriel pour construire un serveur MCP simple en Python](https://github.com/ruslanmv/Simple-MCP-Server-with-Python)
 
 ---
-
-Cette feuille de route vous guidera dans la mise en place d'une infrastructure robuste et évolutive, permettant à vos agents IA d'interagir efficacement avec vos outils métiers via le protocole MCP.
-
-[1]: https://www.epsilon3d.fr/residence-bleu-horizon/?utm_source=chatgpt.com "Résidence Bleu Horizon - Epsilon3D"
+    

@@ -1,2 +1,7 @@
-# Module d'outils pour le serveur MCP
-# Ce fichier permet l'importation des modules comme un package Python
+"""
+Outils disponibles pour le serveur MCP
+"""
+
+from .basic import get_project_status, list_available_tools
+
+__all__ = ["get_project_status", "list_available_tools"]
