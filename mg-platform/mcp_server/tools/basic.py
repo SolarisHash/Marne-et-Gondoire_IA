@@ -34,10 +34,9 @@ def get_project_status() -> Dict:
     }
 
 def list_available_tools() -> List[Dict]:
-    """
-    Liste tous les outils disponibles avec leurs détails
-    """
+    """Liste tous les outils disponibles - VERSION MISE À JOUR"""
     return [
+        # Outils de base
         {
             "name": "get_project_status",
             "description": "Retourne le statut détaillé du projet",
@@ -56,42 +55,40 @@ def list_available_tools() -> List[Dict]:
             "parameters": [],
             "returns": "List[Dict] avec détails des outils"
         },
-        # Outils planifiés
+        
+        # Nouveaux outils d'analyse
         {
-            "name": "run_sql",
-            "description": "Exécute une requête SQL sur la base de données",
-            "category": "database",
-            "status": "planned",
-            "version": "0.0",
-            "parameters": ["query: str"],
-            "returns": "Dict avec résultats de la requête"
+            "name": "analyze_data_gaps",
+            "description": "Analyse un fichier Excel/CSV pour identifier les données manquantes",
+            "category": "analysis",
+            "status": "active",
+            "version": "1.0",
+            "parameters": ["file_path: str (optionnel)"],
+            "returns": "Dict avec analyse complète et opportunités d'enrichissement"
+        },
+        
+        # Outils d'enrichissement LinkedIn
+        {
+            "name": "enrich_file_with_linkedin",
+            "description": "Enrichit un fichier Excel via recherche LinkedIn",
+            "category": "enrichment",
+            "status": "active", 
+            "version": "1.0",
+            "parameters": [
+                "file_path: str (optionnel)",
+                "target_columns: List[str] (optionnel)", 
+                "max_companies: int (optionnel)"
+            ],
+            "returns": "Dict avec résultats enrichissement et fichier généré"
         },
         {
-            "name": "launch_scraper",
-            "description": "Lance un scraper web pour collecter des données",
-            "category": "scraping", 
-            "status": "planned",
-            "version": "0.0",
-            "parameters": ["spider: str", "url: str"],
-            "returns": "Dict avec ID du processus et statut"
-        },
-        {
-            "name": "get_indicator",
-            "description": "Récupère la valeur d'un KPI pour une date donnée",
-            "category": "analytics",
-            "status": "planned", 
-            "version": "0.0",
-            "parameters": ["name: str", "date: str"],
-            "returns": "Dict avec valeur du KPI"
-        },
-        {
-            "name": "forecast_kpi",
-            "description": "Génère une prévision pour un KPI donné",
-            "category": "ml",
-            "status": "planned",
-            "version": "0.0", 
-            "parameters": ["name: str", "horizon: int"],
-            "returns": "Dict avec prévisions"
+            "name": "test_linkedin_enrichment",
+            "description": "Test rapide enrichissement LinkedIn sur échantillon",
+            "category": "enrichment",
+            "status": "active",
+            "version": "1.0", 
+            "parameters": ["sample_size: int"],
+            "returns": "Dict avec résultats de test"
         }
     ]
 
