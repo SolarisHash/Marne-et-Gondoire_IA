@@ -12,8 +12,42 @@ from datetime import datetime
 from typing import Dict, List, Any, Optional, Tuple
 from pathlib import Path
 import logging
+import os
+import sys
 
-from mcp_server.tools.progress_manager import AIProgressTracker
+from openpyxl.styles import PatternFill, Font, Border, Side
+from openpyxl import load_workbook
+
+# Ajouter le répertoire parent au Python path pour les imports
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(os.path.dirname(current_dir))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+# Import corrigé du progress manager
+try:
+    from mcp_server.tools.progress_manager import AIProgressTracker
+except ImportError:
+    # Fallback si le module n'est pas trouvé
+    print("⚠️ Progress manager non disponible, continuons sans...")
+    
+    class AIProgressTracker:
+        """Fallback progress tracker si le module principal n'est pas disponible"""
+        def __init__(self, total_items, task_name="Processing"):
+            self.total_items = total_items
+            self.current = 0
+        
+        def start(self):
+            print(f"🚀 Démarrage: {self.total_items} items à traiter")
+        
+        def update(self, success=True, item_name=""):
+            self.current += 1
+            status = "✅" if success else "❌"
+            print(f"{status} [{self.current}/{self.total_items}] {item_name}")
+        
+        def finish(self):
+            print(f"🎉 Terminé: {self.current}/{self.total_items} traités")
+
 
 class AIEnrichmentAgent:
     """
@@ -787,7 +821,7 @@ class AIEnrichmentAgent:
         return recommendations
     
     def _save_enriched_results(self, sample_df: pd.DataFrame, enrichment_results: Dict) -> str:
-        """Sauvegarde les résultats enrichis avec métadonnées"""
+        """Sauvegarde les résultats enrichis avec colorisation IA"""
         
         # Créer DataFrame enrichi
         enriched_df = sample_df.copy()
@@ -818,7 +852,7 @@ class AIEnrichmentAgent:
                 
                 enriched_df.iloc[idx, enriched_df.columns.get_loc("IA_Source")] = "LinkedIn_AI"
         
-        # Sauvegarder fichier enrichi
+        # Sauvegarder fichier Excel standard
         output_dir = Path("data/processed")
         output_dir.mkdir(exist_ok=True)
         
@@ -827,9 +861,25 @@ class AIEnrichmentAgent:
         
         enriched_df.to_excel(output_path, index=False)
         
-        self.logger.info(f"💾 Fichier enrichi sauvegardé: {output_path}")
-        
-        return str(output_path)
+        # 🎨 COLORISATION AVEC ROUGE POUR IA
+        try:
+            colorizer = ExcelColorizerAI()
+            colorized_path = colorizer.colorize_ai_enriched_file(
+                str(output_path), 
+                enrichment_results["enrichment_data"],
+                self.session_id
+            )
+            
+            self.logger.info(f"🎨 Fichier colorisé créé: {colorized_path}")
+            
+            # Retourner le fichier colorisé comme fichier principal
+            return colorized_path
+            
+        except Exception as e:
+            self.logger.warning(f"⚠️ Colorisation échouée: {e}")
+            # Retourner le fichier standard si colorisation échoue
+            return str(output_path)
+
     
     def _generate_error_analytics(self) -> Dict[str, Any]:
         """Analytics en cas d'erreur critique"""
@@ -960,6 +1010,162 @@ def _enrich_companies_ai_with_progress(self, sample_df: pd.DataFrame) -> Dict[st
     self.logger.info(f"🎯 Enrichissement terminé: {results['enriched']}/{results['processed']} succès")
     
     return results
+
+class ExcelColorizerAI:
+    """
+    Système de colorisation Excel pour différencier les données IA
+    🔴 Rouge = Données enrichies par IA
+    ⚪ Standard = Données originales
+    """
+    
+    def __init__(self):
+        # Styles de colorisation
+        self.ai_fill = PatternFill(start_color="FFE6E6", end_color="FFE6E6", fill_type="solid")  # Rouge clair
+        self.ai_font = Font(color="CC0000", bold=True)  # Rouge foncé et gras
+        self.ai_border = Border(
+            left=Side(border_style="thin", color="CC0000"),
+            right=Side(border_style="thin", color="CC0000"),
+            top=Side(border_style="thin", color="CC0000"),
+            bottom=Side(border_style="thin", color="CC0000")
+        )
+        
+        # Styles pour métadonnées IA
+        self.meta_fill = PatternFill(start_color="F0F8FF", end_color="F0F8FF", fill_type="solid")  # Bleu clair
+        self.meta_font = Font(color="0066CC", italic=True)  # Bleu et italique
+    
+    def colorize_ai_enriched_file(self, file_path: str, enrichment_data: dict, session_id: str) -> str:
+        """
+        Colorise un fichier Excel avec les données IA en rouge
+        
+        Args:
+            file_path: Chemin du fichier Excel
+            enrichment_data: Données d'enrichissement par index
+            session_id: ID de session pour traçabilité
+        
+        Returns:
+            Chemin du fichier colorisé
+        """
+        try:
+            print(f"🎨 Colorisation du fichier Excel...")
+            
+            # Charger le workbook
+            wb = load_workbook(file_path)
+            ws = wb.active
+            
+            # Identifier les colonnes enrichies
+            enriched_columns = self._find_enriched_columns(ws)
+            
+            # Coloriser les cellules enrichies
+            for row_idx, enrichment in enrichment_data.items():
+                excel_row = int(row_idx) + 1  # +1 car Excel commence à 1, +1 pour header
+                
+                # Coloriser les données enrichies
+                self._colorize_enriched_row(ws, excel_row, enriched_columns, enrichment)
+            
+            # Coloriser les colonnes de métadonnées IA
+            self._colorize_metadata_columns(ws)
+            
+            # Ajouter légende
+            self._add_legend(ws)
+            
+            # Sauvegarder le fichier colorisé
+            colorized_path = file_path.replace('.xlsx', '_COLORIZED.xlsx')
+            wb.save(colorized_path)
+            
+            print(f"✅ Fichier colorisé sauvegardé: {colorized_path}")
+            return colorized_path
+            
+        except Exception as e:
+            print(f"⚠️ Erreur colorisation: {e}")
+            return file_path  # Retourner le fichier original si erreur
+    
+    def _find_enriched_columns(self, ws) -> list:
+        """Trouve les colonnes qui ont été enrichies"""
+        enriched_cols = []
+        
+        # Parcourir la première ligne (header) pour identifier les colonnes enrichissables
+        for col_idx, cell in enumerate(ws[1], 1):
+            if cell.value:
+                col_name = str(cell.value).lower()
+                
+                # Colonnes typiquement enrichies par IA
+                if any(keyword in col_name for keyword in [
+                    'site', 'web', 'email', 'telephone', 'phone', 
+                    'linkedin', 'facebook', 'twitter', 'url'
+                ]):
+                    enriched_cols.append(col_idx)
+        
+        return enriched_cols
+    
+    def _colorize_enriched_row(self, ws, row_idx: int, enriched_columns: list, enrichment_data: dict):
+        """Colorise une ligne enrichie par IA"""
+        
+        # Coloriser les colonnes enrichies pour cette ligne
+        for col_idx in enriched_columns:
+            cell = ws.cell(row=row_idx, column=col_idx)
+            
+            # Vérifier si la cellule contient des données IA
+            if self._cell_contains_ai_data(cell, enrichment_data):
+                # Appliquer le style IA (rouge)
+                cell.fill = self.ai_fill
+                cell.font = self.ai_font
+                cell.border = self.ai_border
+    
+    def _cell_contains_ai_data(self, cell, enrichment_data: dict) -> bool:
+        """Vérifie si une cellule contient des données enrichies par IA"""
+        
+        if not cell.value or not enrichment_data:
+            return False
+        
+        cell_value = str(cell.value).strip()
+        
+        # Vérifier si la valeur correspond aux données IA
+        ai_values = []
+        if 'website' in enrichment_data:
+            ai_values.append(enrichment_data['website'])
+        if 'linkedin_url' in enrichment_data:
+            ai_values.append(enrichment_data['linkedin_url'])
+        
+        return any(cell_value == str(ai_val) for ai_val in ai_values if ai_val)
+    
+    def _colorize_metadata_columns(self, ws):
+        """Colorise les colonnes de métadonnées IA"""
+        
+        # Identifier les colonnes de métadonnées IA
+        for col_idx, cell in enumerate(ws[1], 1):
+            if cell.value and str(cell.value).startswith('IA_'):
+                # Coloriser toute la colonne de métadonnées
+                for row in ws.iter_rows(min_col=col_idx, max_col=col_idx):
+                    for cell in row:
+                        cell.fill = self.meta_fill
+                        cell.font = self.meta_font
+    
+    def _add_legend(self, ws):
+        """Ajoute une légende explicative"""
+        
+        # Trouver la dernière ligne avec données
+        last_row = ws.max_row + 2
+        
+        # Ajouter la légende
+        legend_data = [
+            ["", "LÉGENDE"],
+            ["", "🔴 Rouge = Données enrichies par IA"],
+            ["", "🔵 Bleu = Métadonnées IA"],
+            ["", "⚪ Standard = Données originales"]
+        ]
+        
+        for i, (col1, col2) in enumerate(legend_data):
+            ws.cell(row=last_row + i, column=1, value=col1)
+            legend_cell = ws.cell(row=last_row + i, column=2, value=col2)
+            
+            if i == 0:  # Titre
+                legend_cell.font = Font(bold=True, size=12)
+            elif "Rouge" in col2:
+                legend_cell.fill = self.ai_fill
+                legend_cell.font = self.ai_font
+            elif "Bleu" in col2:
+                legend_cell.fill = self.meta_fill
+                legend_cell.font = self.meta_font
 
 # Alias pour compatibilité
 ai_agent_enrich = run_ai_enrichment_agent

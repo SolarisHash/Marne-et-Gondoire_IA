@@ -230,13 +230,6 @@ async def analyze_with_colors():
     except Exception as e:
         return f"\033[91m❌ ERREUR: {str(e)}\033[0m"
 
-# ============================================================================
-# NOUVEAU ENDPOINT COMPLET dans main.py
-# ============================================================================
-
-# ============================================================================
-# CORRECTION de l'endpoint analyze-complete dans main.py
-# ============================================================================
 
 @app.get("/analyze-complete", response_class=PlainTextResponse)
 async def analyze_complete():
@@ -558,10 +551,6 @@ async def run_ai_agent_enrichment(
 ):
     """
     🤖 Lance l'Agent IA autonome d'enrichissement
-    
-    - **sample_size**: Nombre d'entreprises (max 50 en mode test)
-    - **quality_threshold**: Seuil qualité (85% recommandé)
-    - **test_mode**: Sécurité pour éviter traitement massif accidentel
     """
     try:
         # Sécurité mode test
@@ -571,7 +560,7 @@ async def run_ai_agent_enrichment(
                 "suggestion": "Désactiver test_mode pour traitement plus large"
             }
         
-        # Import de l'agent IA
+        # Import direct du fichier ai_agent.py (CORRIGÉ)
         import os
         import importlib.util
         
@@ -581,16 +570,17 @@ async def run_ai_agent_enrichment(
         if not os.path.exists(agent_path):
             return {
                 "error": "Agent IA non trouvé",
-                "solution": "Créez le fichier mcp_server/tools/ai_agent.py"
+                "solution": "Créez le fichier mcp_server/tools/ai_agent.py",
+                "path_checked": agent_path
             }
         
-        # Charger l'agent IA
+        # Charger le module ai_agent dynamiquement
         spec = importlib.util.spec_from_file_location("ai_agent", agent_path)
-        ai_agent = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(ai_agent)
+        ai_agent_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(ai_agent_module)
         
         # Lancer l'enrichissement IA
-        result = ai_agent.run_ai_enrichment_agent(sample_size)
+        result = ai_agent_module.run_ai_enrichment_agent(sample_size)
         
         return result
         
@@ -598,7 +588,8 @@ async def run_ai_agent_enrichment(
         return {
             "error": f"Erreur Agent IA: {str(e)}",
             "error_type": type(e).__name__,
-            "suggestion": "Vérifiez les logs et la configuration de l'agent"
+            "current_dir": os.path.dirname(os.path.abspath(__file__)),
+            "suggestion": "Vérifiez que ai_agent.py existe dans tools/ et contient run_ai_enrichment_agent()"
         }
 
 @app.get("/ai-agent/report", response_class=PlainTextResponse)
@@ -832,6 +823,70 @@ async def ai_agent_status():
             "error": str(e),
             "suggestion": "Vérifiez la configuration de l'Agent IA"
         }
+
+@app.get("/ai-agent/test-import")
+async def test_ai_agent_import():
+    """
+    🧪 Test simple pour vérifier que l'agent IA peut être importé
+    """
+    try:
+        import os
+        import importlib.util
+        
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        agent_path = os.path.join(current_dir, "tools", "ai_agent.py")
+        
+        # Vérifications étape par étape
+        checks = {
+            "file_exists": os.path.exists(agent_path),
+            "file_path": agent_path,
+            "tools_dir_exists": os.path.exists(os.path.join(current_dir, "tools")),
+            "tools_dir_content": []
+        }
+        
+        # Lister le contenu du dossier tools
+        tools_dir = os.path.join(current_dir, "tools")
+        if os.path.exists(tools_dir):
+            checks["tools_dir_content"] = os.listdir(tools_dir)
+        
+        # Essayer d'importer si le fichier existe
+        if checks["file_exists"]:
+            try:
+                spec = importlib.util.spec_from_file_location("ai_agent", agent_path)
+                ai_agent_module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(ai_agent_module)
+                
+                # Vérifier que la fonction principale existe
+                has_main_function = hasattr(ai_agent_module, 'run_ai_enrichment_agent')
+                
+                checks.update({
+                    "import_successful": True,
+                    "has_main_function": has_main_function,
+                    "available_functions": [attr for attr in dir(ai_agent_module) if not attr.startswith('_')]
+                })
+                
+                if has_main_function:
+                    checks["status"] = "✅ Agent IA prêt"
+                else:
+                    checks["status"] = "⚠️ Agent IA importé mais fonction principale manquante"
+                
+            except Exception as import_error:
+                checks.update({
+                    "import_successful": False,
+                    "import_error": str(import_error),
+                    "status": "❌ Erreur d'import"
+                })
+        else:
+            checks["status"] = "❌ Fichier ai_agent.py non trouvé"
+        
+        return checks
+        
+    except Exception as e:
+        return {
+            "error": f"Erreur test import: {str(e)}",
+            "error_type": type(e).__name__
+        }
+
 
 if __name__ == "__main__":
     port = int(os.getenv("SERVER_PORT", 8080))

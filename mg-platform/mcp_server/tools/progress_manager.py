@@ -1,4 +1,3 @@
-
 import time
 import sys
 import threading
@@ -7,7 +6,7 @@ from typing import Optional, Dict, Any
 
 class AIProgressTracker:
     """
-    Système de barre de progression temps réel pour l'Agent IA
+    Système de barre de progression temps réel pour l'Agent IA - VERSION CORRIGÉE
     Affiche progression, temps écoulé, temps restant, et statistiques live
     """
     
@@ -28,7 +27,10 @@ class AIProgressTracker:
         
         # Configuration affichage
         self.bar_width = 40
-        self.update_interval = 0.5  # Mise à jour toutes les 0.5 secondes
+        self.update_interval = 1.0  # Mise à jour toutes les 1 seconde
+        
+        # Contrôle thread-safe
+        self._lock = threading.Lock()
     
     def start(self):
         """Démarre le tracking avec affichage temps réel"""
@@ -36,113 +38,117 @@ class AIProgressTracker:
         self.last_update = self.start_time
         self.is_running = True
         
-        # Affichage initial
-        self._clear_lines(3)
-        print(f"\n🚀 {self.task_name} - Démarrage")
-        print("=" * 60)
-        
-        # Démarrer thread de mise à jour
-        self.update_thread = threading.Thread(target=self._update_display_loop, daemon=True)
-        self.update_thread.start()
-        
-        # Affichage initial de la barre
-        self._update_display()
+        # Affichage initial sécurisé
+        try:
+            print(f"\n🚀 {self.task_name} - Démarrage", flush=True)
+            print("=" * 60, flush=True)
+            
+            # Démarrer thread de mise à jour seulement si on est dans un terminal
+            if sys.stdout.isatty():
+                self.update_thread = threading.Thread(target=self._update_display_loop, daemon=True)
+                self.update_thread.start()
+            
+            # Affichage initial de la barre
+            self._update_display()
+            
+        except Exception as e:
+            print(f"⚠️ Affichage progression limité: {e}")
     
     def update(self, success: bool = True, item_name: str = ""):
-        """Met à jour la progression"""
-        self.current_item += 1
+        """Met à jour la progression de façon thread-safe"""
+        with self._lock:
+            self.current_item += 1
+            
+            if success:
+                self.successful += 1
+            else:
+                self.failed += 1
+            
+            self.last_update = datetime.now()
         
-        if success:
-            self.successful += 1
-        else:
-            self.failed += 1
-        
-        self.last_update = datetime.now()
-        
-        # Log de l'item traité (optionnel)
+        # Log de l'item traité (version sécurisée)
         if item_name:
             status = "✅" if success else "❌"
-            print(f"\r{' ' * 80}\r{status} {item_name[:50]}", end="", flush=True)
-            time.sleep(0.3)  # Laisser le temps de voir le nom
+            try:
+                # Affichage simple et sûr
+                print(f"{status} [{self.current_item}/{self.total_items}] {item_name[:50]}", flush=True)
+            except Exception:
+                # Fallback silencieux si problème d'affichage
+                pass
     
     def finish(self):
         """Termine le tracking"""
         self.is_running = False
         
-        if self.update_thread:
-            self.update_thread.join(timeout=1)
+        if self.update_thread and self.update_thread.is_alive():
+            self.update_thread.join(timeout=2)
         
-        # Affichage final
-        self._update_display()
-        
-        total_time = (datetime.now() - self.start_time).total_seconds()
-        
-        print(f"\n\n🎉 {self.task_name} terminé !")
-        print(f"⏱️  Durée totale: {self._format_duration(total_time)}")
-        print(f"📊 Résultats: {self.successful} succès, {self.failed} échecs")
-        print(f"🎯 Taux de réussite: {(self.successful / self.total_items * 100):.1f}%")
-        print("=" * 60)
+        # Affichage final sécurisé
+        try:
+            total_time = (datetime.now() - self.start_time).total_seconds() if self.start_time else 0
+            
+            print(f"\n🎉 {self.task_name} terminé !", flush=True)
+            print(f"⏱️  Durée totale: {self._format_duration(total_time)}", flush=True)
+            print(f"📊 Résultats: {self.successful} succès, {self.failed} échecs", flush=True)
+            
+            if self.total_items > 0:
+                success_rate = (self.successful / self.total_items * 100)
+                print(f"🎯 Taux de réussite: {success_rate:.1f}%", flush=True)
+            
+            print("=" * 60, flush=True)
+            
+        except Exception as e:
+            print(f"⚠️ Erreur affichage final: {e}")
     
     def _update_display_loop(self):
-        """Boucle de mise à jour continue de l'affichage"""
+        """Boucle de mise à jour continue - VERSION SÉCURISÉE"""
         while self.is_running:
-            time.sleep(self.update_interval)
-            if self.is_running:
-                self._update_display()
+            try:
+                time.sleep(self.update_interval)
+                if self.is_running:
+                    self._update_display_safe()
+            except Exception:
+                # Continue silencieusement en cas d'erreur
+                pass
+    
+    def _update_display_safe(self):
+        """Version sécurisée de l'affichage"""
+        try:
+            if not self.start_time or not sys.stdout.isatty():
+                return
+            
+            with self._lock:
+                current = self.current_item
+                successful = self.successful
+                failed = self.failed
+            
+            # Calculs temporels
+            now = datetime.now()
+            elapsed = (now - self.start_time).total_seconds()
+            
+            # Progression
+            progress = current / self.total_items if self.total_items > 0 else 0
+            percentage = progress * 100
+            
+            # Construction simple de la barre
+            filled_length = int(30 * progress)  # Barre plus courte pour compatibilité
+            bar = "█" * filled_length + "░" * (30 - filled_length)
+            
+            # Affichage sur une ligne
+            status_line = f"\r🤖 [{bar}] {percentage:5.1f}% ({current}/{self.total_items}) ✅{successful} ❌{failed}"
+            
+            print(status_line, end='', flush=True)
+            
+        except Exception:
+            # Échec silencieux pour éviter de casser l'exécution
+            pass
     
     def _update_display(self):
-        """Met à jour l'affichage de la barre de progression"""
-        if not self.start_time:
-            return
-        
-        # Calculs temporels
-        now = datetime.now()
-        elapsed = (now - self.start_time).total_seconds()
-        
-        # Progression
-        progress = self.current_item / self.total_items if self.total_items > 0 else 0
-        percentage = progress * 100
-        
-        # Estimation temps restant
-        if self.current_item > 0 and progress > 0:
-            estimated_total_time = elapsed / progress
-            remaining_time = estimated_total_time - elapsed
-        else:
-            remaining_time = 0
-        
-        # Vitesse de traitement
-        items_per_second = self.current_item / elapsed if elapsed > 0 else 0
-        
-        # Construction de la barre
-        filled_length = int(self.bar_width * progress)
-        bar = "█" * filled_length + "░" * (self.bar_width - filled_length)
-        
-        # Effacer les lignes précédentes et afficher
-        self._clear_lines(3)
-        
-        # Ligne 1: Barre de progression
-        print(f"\r🤖 {self.task_name}")
-        
-        # Ligne 2: Barre visuelle avec pourcentage
-        print(f"[{bar}] {percentage:5.1f}% ({self.current_item}/{self.total_items})")
-        
-        # Ligne 3: Statistiques temps réel
-        stats = (
-            f"⏱️  {self._format_duration(elapsed)} écoulé | "
-            f"🕐 {self._format_duration(remaining_time)} restant | "
-            f"⚡ {items_per_second:.1f}/s | "
-            f"✅ {self.successful} | ❌ {self.failed}"
-        )
-        print(stats)
-        
-        sys.stdout.flush()
-    
-    def _clear_lines(self, num_lines: int):
-        """Efface les lignes précédentes dans le terminal"""
-        for _ in range(num_lines):
-            # Déplacer le curseur vers le haut et effacer la ligne
-            sys.stdout.write('\033[A\033[K')
-        sys.stdout.flush()
+        """Affichage initial simple"""
+        try:
+            print(f"🤖 Traitement de {self.total_items} entreprises...", flush=True)
+        except Exception:
+            pass
     
     def _format_duration(self, seconds: float) -> str:
         """Formate une durée en secondes vers un format lisible"""
