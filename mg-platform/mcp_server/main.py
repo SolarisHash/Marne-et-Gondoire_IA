@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 from typing import List, Optional
+from fastapi.responses import PlainTextResponse
 
 # Charger les variables d'environnement
 load_dotenv()
@@ -65,75 +66,39 @@ async def health_check():
         }
     }
 
-@app.get("/analyze")
-async def analyze_excel_data(file_path: Optional[str] = None):
-    """
-    Analyse un fichier Excel pour identifier les données manquantes
-    """
+@app.get("/analyze-advanced")
+async def analyze_advanced():
+    """Analyse avancée avec détection précise des opportunités LinkedIn"""
     try:
-        # Test basique d'abord
-        from pathlib import Path
+        # Import direct du fichier
+        import os
+        import importlib.util
         
-        # Vérifier que data/raw existe
-        project_root = Path(__file__).parent.parent
-        raw_dir = project_root / "data" / "raw"
+        # Chemin vers le fichier data_analyzer.py
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        analyzer_path = os.path.join(current_dir, "tools", "data_analyzer.py")
         
-        if not raw_dir.exists():
+        if not os.path.exists(analyzer_path):
             return {
-                "error": "Dossier data/raw/ non trouvé",
-                "current_dir": str(project_root),
-                "suggestion": f"Créez le dossier: mkdir -p {raw_dir}"
+                "error": f"Fichier non trouvé: {analyzer_path}",
+                "current_dir": current_dir,
+                "tools_exists": os.path.exists(os.path.join(current_dir, "tools"))
             }
         
-        # Lister les fichiers disponibles
-        files = list(raw_dir.glob("*"))
-        excel_files = list(raw_dir.glob("*.xlsx")) + list(raw_dir.glob("*.xls"))
+        # Charger le module dynamiquement
+        spec = importlib.util.spec_from_file_location("data_analyzer", analyzer_path)
+        data_analyzer = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(data_analyzer)
         
-        if not excel_files:
-            return {
-                "error": "Aucun fichier Excel trouvé",
-                "raw_dir": str(raw_dir),
-                "files_found": [f.name for f in files],
-                "expected_file": "Non diffusible_2025-04-14.xlsx"
-            }
+        # Appeler la fonction
+        result = data_analyzer.analyze_data_gaps_advanced()
+        return result
         
-        # Si on arrive ici, on a au moins un fichier Excel
-        target_file = excel_files[0]
-        
-        # Test simple de lecture
-        try:
-            import pandas as pd
-            df = pd.read_excel(target_file)
-            
-            return {
-                "status": "success",
-                "message": "Analyse basique réussie",
-                "file_info": {
-                    "name": target_file.name,
-                    "path": str(target_file),
-                    "rows": len(df),
-                    "columns": len(df.columns)
-                },
-                "first_columns": list(df.columns[:10]),
-                "next_step": "Créez data_analyzer.py pour analyse avancée"
-            }
-            
-        except Exception as e:
-            return {
-                "error": f"Impossible de lire le fichier Excel: {str(e)}",
-                "file": str(target_file),
-                "suggestion": "Vérifiez que pandas et openpyxl sont installés: pip install pandas openpyxl"
-            }
-        
-    except ImportError as e:
-        return {
-            "error": f"Module manquant: {str(e)}",
-            "suggestion": "Installez pandas: pip install pandas openpyxl"
-        }
     except Exception as e:
         return {
-            "error": f"Erreur inattendue: {str(e)}",
-            "type": type(e).__name__
+            "error": f"Erreur: {str(e)}",
+            "type": type(e).__name__,
+            "current_dir": os.path.dirname(os.path.abspath(__file__))
         }
 
 @app.get("/test-basic")
@@ -186,6 +151,83 @@ async def analyze_advanced():
         return {
             "error": f"Erreur analyse avancée: {str(e)}"
         }
+
+@app.get("/analyze-color", response_class=PlainTextResponse)
+async def analyze_with_colors():
+    """Version avec codes couleur ANSI pour terminal"""
+    try:
+        import os
+        import importlib.util
+        
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        analyzer_path = os.path.join(current_dir, "tools", "data_analyzer.py")
+        
+        spec = importlib.util.spec_from_file_location("data_analyzer", analyzer_path)
+        data_analyzer = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(data_analyzer)
+        
+        result = data_analyzer.analyze_data_gaps_advanced()
+        
+        if "error" in result:
+            return f"\033[91m❌ ERREUR: {result['error']}\033[0m"
+        
+        # Codes couleur ANSI
+        RED = '\033[91m'
+        GREEN = '\033[92m'
+        YELLOW = '\033[93m'
+        BLUE = '\033[94m'
+        PURPLE = '\033[95m'
+        CYAN = '\033[96m'
+        WHITE = '\033[97m'
+        BOLD = '\033[1m'
+        END = '\033[0m'
+        
+        report = f"""
+{BOLD}{CYAN}🚀 ANALYSE MARNE & GONDOIRE{END}
+{CYAN}{'='*50}{END}
+
+{BOLD}📁 FICHIER:{END}
+  {result['file_info']['name']}
+  {GREEN}{result['file_info']['total_companies']:,} entreprises{END} | {result['file_info']['total_columns']} colonnes
+
+{BOLD}📊 VUE D'ENSEMBLE:{END}
+  Complétion moyenne: {GREEN if result['global_stats']['average_completion_rate'] > 70 else YELLOW}{result['global_stats']['average_completion_rate']}%{END}
+  Champs manquants: {RED}{result['global_stats']['total_missing_fields']:,}{END}
+
+{BOLD}{RED}🔥 TOP OPPORTUNITÉS LINKEDIN:{END}
+"""
+        
+        for i, priority in enumerate(result['top_priorities'][:3], 1):
+            priority_color = RED if "CRITIQUE" in priority['priority'] else YELLOW if "HAUTE" in priority['priority'] else GREEN
+            report += f"""
+                {BOLD}{i}. {priority['column']}{END}
+                {RED}Manquants: {priority['missing_count']:,}{END} | {GREEN}Gain: {priority['estimated_gain']:,}{END}
+                {priority_color}{priority['priority']}{END}
+            """
+
+        # Sites web spécifiquement
+        site_priority = result['top_priorities'][0]
+        if 'site' in site_priority['column'].lower():
+            report += f"""
+                {BOLD}{GREEN}💰 JACKPOT SITES WEB:{END}
+                {RED}{site_priority['missing_count']:,}{END} sites manquants sur {result['file_info']['total_companies']:,}
+                {GREEN}{site_priority['estimated_gain']:,}{END} sites récupérables via LinkedIn
+                {YELLOW}Temps estimé: {result['batch_strategy']['estimated_processing_time']}{END}
+            """
+
+        report += f"""
+                {BOLD}{BLUE}🚀 COMMANDES RAPIDES:{END}
+                Test:       {CYAN}curl http://localhost:8080/enrich?test_mode=true{END}
+                Sites web:  {CYAN}curl -X POST http://localhost:8080/enrich-websites{END}
+                Rapport:    {CYAN}curl http://localhost:8080/analyze-report{END}
+
+                {BOLD}{GREEN}✨ Prêt pour l'enrichissement !{END}
+            """
+        
+        return report
+        
+    except Exception as e:
+        return f"\033[91m❌ ERREUR: {str(e)}\033[0m"
 
 if __name__ == "__main__":
     port = int(os.getenv("SERVER_PORT", 8080))

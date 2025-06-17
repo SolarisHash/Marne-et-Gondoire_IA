@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np  # Ajouter cette ligne en haut du fichier
 import os
 from typing import Dict, List, Any, Optional
 from pathlib import Path
@@ -6,7 +7,7 @@ from pathlib import Path
 def analyze_data_gaps_advanced(file_path: str = None) -> Dict[str, Any]:
     """
     Analyse avancée d'un fichier Excel pour identifier les données manquantes
-    Optimisé pour de gros volumes (3000+ entreprises)
+    Optimisé pour de gros volumes (3000+ entreprises) avec gestion des NaN
     """
     
     try:
@@ -22,8 +23,12 @@ def analyze_data_gaps_advanced(file_path: str = None) -> Dict[str, Any]:
             file_path = excel_files[0]
             print(f"📊 Analyse avancée du fichier: {file_path.name}")
         
-        # Lecture du fichier Excel
+        # Lecture du fichier Excel avec gestion des NaN
         df = pd.read_excel(file_path, engine='openpyxl')
+        
+        # Remplacer toutes les valeurs NaN par des chaînes vides pour éviter les erreurs JSON
+        df = df.fillna('')
+        
         print(f"📈 Fichier chargé: {len(df)} entreprises, {len(df.columns)} colonnes")
         
         # Patterns de valeurs manquantes spécifiques SIRENE
@@ -42,13 +47,12 @@ def analyze_data_gaps_advanced(file_path: str = None) -> Dict[str, Any]:
         total_rows = len(df)
         
         for col in df.columns:
-            # Calculer les valeurs manquantes
-            missing_mask = df[col].isnull()
+            # Calculer les valeurs manquantes (après fillna, plus de NaN)
+            missing_mask = df[col] == ''  # Cellules vides
             
             # Ajouter les patterns spécifiques
-            for pattern in missing_patterns[:-2]:  # Exclure nan/NaN déjà gérés
-                if pattern:
-                    missing_mask |= (df[col].astype(str).str.strip() == pattern)
+            for pattern in missing_patterns[1:]:  # Exclure '' déjà géré
+                missing_mask |= (df[col].astype(str).str.strip() == pattern)
             
             missing_count = missing_mask.sum()
             present_count = total_rows - missing_count
@@ -58,13 +62,14 @@ def analyze_data_gaps_advanced(file_path: str = None) -> Dict[str, Any]:
             enrichable = is_linkedin_enrichable(col)
             priority = get_enrichment_priority(col, completion_rate, missing_count)
             
+            # S'assurer que toutes les valeurs sont JSON-compatibles
             analysis[col] = {
-                "completion_rate": round(completion_rate, 1),
+                "completion_rate": round(float(completion_rate), 1),
                 "missing_count": int(missing_count),
                 "present_count": int(present_count),
-                "linkedin_enrichable": enrichable,
-                "priority": priority,
-                "estimated_gain": calculate_potential_gain(col, missing_count) if enrichable else 0
+                "linkedin_enrichable": bool(enrichable),
+                "priority": str(priority),
+                "estimated_gain": int(calculate_potential_gain(col, missing_count)) if enrichable else 0
             }
         
         # Identifier les meilleures opportunités
@@ -73,44 +78,60 @@ def analyze_data_gaps_advanced(file_path: str = None) -> Dict[str, Any]:
             if data["linkedin_enrichable"] and data["missing_count"] > 100  # Au moins 100 manquants
         }
         
-        # Statistiques globales
+        # Statistiques globales avec conversion explicite
         avg_completion = sum(data["completion_rate"] for data in analysis.values()) / len(analysis)
         total_missing_fields = sum(data["missing_count"] for data in analysis.values())
         
         # Recommandations spécifiques pour gros volume
         recommendations = generate_batch_recommendations(linkedin_opportunities, total_rows)
         
-        return {
+        # S'assurer que le résultat est JSON-compatible
+        result = {
             "status": "✅ ANALYSE AVANCÉE TERMINÉE",
             "file_info": {
                 "name": Path(file_path).name,
                 "path": str(file_path),
-                "total_companies": total_rows,
-                "total_columns": len(df.columns),
-                "file_size_mb": round(Path(file_path).stat().st_size / (1024*1024), 2)
+                "total_companies": int(total_rows),
+                "total_columns": int(len(df.columns)),
+                "file_size_mb": round(float(Path(file_path).stat().st_size / (1024*1024)), 2)
             },
             "global_stats": {
-                "average_completion_rate": round(avg_completion, 1),
+                "average_completion_rate": round(float(avg_completion), 1),
                 "total_missing_fields": int(total_missing_fields),
-                "fields_per_company": round(total_missing_fields / total_rows, 1)
+                "fields_per_company": round(float(total_missing_fields / total_rows), 1)
             },
             "column_analysis": analysis,
             "linkedin_opportunities": linkedin_opportunities,
             "recommendations": recommendations,
             "batch_strategy": {
-                "recommended_batch_size": min(50, max(10, total_rows // 100)),
-                "estimated_processing_time": f"{(total_rows * 2) // 60} minutes",
+                "recommended_batch_size": int(min(50, max(10, total_rows // 100))),
+                "estimated_processing_time": f"{int((total_rows * 2) // 60)} minutes",
                 "rate_limiting": "2 secondes entre requêtes"
             },
             "top_priorities": get_top_priorities(linkedin_opportunities),
             "sample_companies": get_sample_companies(df, limit=5)
         }
         
+        # Validation finale : s'assurer qu'il n'y a pas de NaN dans le résultat
+        return clean_nan_from_dict(result)
+        
     except Exception as e:
         return {
             "error": f"Erreur lors de l'analyse avancée: {str(e)}",
-            "file_path": str(file_path) if file_path else "Non spécifié"
+            "file_path": str(file_path) if file_path else "Non spécifié",
+            "error_type": type(e).__name__
         }
+
+def clean_nan_from_dict(obj):
+    """Nettoie récursivement les valeurs NaN d'un dictionnaire pour la sérialisation JSON"""
+    if isinstance(obj, dict):
+        return {k: clean_nan_from_dict(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [clean_nan_from_dict(v) for v in obj]
+    elif isinstance(obj, float) and (np.isnan(obj) or np.isinf(obj)):
+        return 0.0  # Remplacer NaN/Inf par 0
+    else:
+        return obj
 
 def is_linkedin_enrichable(column_name: str) -> bool:
     """Détermine si une colonne peut être enrichie via LinkedIn"""
@@ -188,11 +209,11 @@ def generate_batch_recommendations(opportunities: Dict, total_companies: int) ->
         recommendations.append({
             "action": "🌐 Enrichissement sites web",
             "columns": web_cols,
-            "companies_affected": missing,
-            "estimated_success": gain,
+            "companies_affected": int(missing),
+            "estimated_success": int(gain),
             "priority": "🔥 CRITIQUE",
-            "batch_approach": f"Traiter par batch de 50 entreprises",
-            "estimated_time": f"{(missing * 2) // 60} minutes"
+            "batch_approach": "Traiter par batch de 50 entreprises",
+            "estimated_time": f"{int((missing * 2) // 60)} minutes"
         })
     
     # Effectifs
@@ -204,8 +225,8 @@ def generate_batch_recommendations(opportunities: Dict, total_companies: int) ->
         recommendations.append({
             "action": "👥 Mise à jour effectifs",
             "columns": effectif_cols,
-            "companies_affected": missing,
-            "estimated_success": gain,
+            "companies_affected": int(missing),
+            "estimated_success": int(gain),
             "priority": "🟠 HAUTE",
             "batch_approach": "Traiter en même temps que les sites web"
         })
@@ -233,10 +254,10 @@ def get_top_priorities(opportunities: Dict) -> List[Dict]:
     
     return [
         {
-            "column": col,
-            "missing_count": data["missing_count"],
-            "priority": data["priority"],
-            "estimated_gain": data["estimated_gain"]
+            "column": str(col),
+            "missing_count": int(data["missing_count"]),
+            "priority": str(data["priority"]),
+            "estimated_gain": int(data["estimated_gain"])
         }
         for col, data in sorted_opportunities[:5]
     ]
@@ -253,4 +274,7 @@ def get_sample_companies(df: pd.DataFrame, limit: int = 5) -> List[Dict]:
         key_columns = df.columns[:5].tolist()
     
     sample = df[key_columns].head(limit)
-    return sample.to_dict('records')
+    
+    # Convertir en dict et nettoyer les NaN
+    result = sample.to_dict('records')
+    return clean_nan_from_dict(result)
