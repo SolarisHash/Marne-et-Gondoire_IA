@@ -1,280 +1,354 @@
+# ============================================================================
+# ANALYSEUR SIMPLE ET FONCTIONNEL - mcp_server/tools/data_analyzer.py
+# ============================================================================
+
 import pandas as pd
-import numpy as np  # Ajouter cette ligne en haut du fichier
+import numpy as np
 import os
 from typing import Dict, List, Any, Optional
 from pathlib import Path
 
-def analyze_data_gaps_advanced(file_path: str = None) -> Dict[str, Any]:
+def analyze_complete_file(file_path: str = None) -> Dict[str, Any]:
     """
-    Analyse avancée d'un fichier Excel pour identifier les données manquantes
-    Optimisé pour de gros volumes (3000+ entreprises) avec gestion des NaN
+    Analyseur simple qui fonctionne à coup sûr
+    Analyse TOUTES les colonnes avec détection automatique basique
     """
     
     try:
-        # Auto-détection du fichier dans data/raw/
+        # 1. Trouver et lire le fichier
         if file_path is None:
-            project_root = Path(__file__).parent.parent.parent
-            raw_dir = project_root / "data" / "raw"
+            file_path = find_excel_file()
+        
+        if not file_path:
+            return {"error": "Aucun fichier Excel trouvé dans data/raw/"}
+        
+        # 2. Lire le fichier
+        df = read_excel_safe(file_path)
+        
+        # 3. Nettoyer les données
+        df_clean = clean_dataframe(df)
+        
+        print(f"📊 Analyse: {len(df_clean)} lignes × {len(df_clean.columns)} colonnes")
+        
+        # 4. Analyser chaque colonne
+        all_columns = {}
+        enrichment_opportunities = {}
+        
+        for col_name in df_clean.columns:
+            print(f"🔍 Analyse colonne: {col_name}")
             
-            excel_files = list(raw_dir.glob("*.xlsx")) + list(raw_dir.glob("*.xls"))
-            if not excel_files:
-                return {"error": "Aucun fichier Excel trouvé dans data/raw/"}
+            # Analyse de base de la colonne
+            col_analysis = analyze_column(df_clean[col_name], col_name)
+            all_columns[col_name] = col_analysis
             
-            file_path = excel_files[0]
-            print(f"📊 Analyse avancée du fichier: {file_path.name}")
+            # Si enrichissable, ajouter aux opportunités
+            if col_analysis["enrichment_potential"]["is_enrichable"]:
+                enrichment_opportunities[col_name] = {
+                    "missing_count": col_analysis["missing_count"],
+                    "completion_rate": col_analysis["completion_rate"],
+                    "estimated_gain": col_analysis["enrichment_potential"]["estimated_gain"],
+                    "priority": col_analysis["enrichment_potential"]["priority"],
+                    "sources": col_analysis["enrichment_potential"]["sources"]
+                }
         
-        # Lecture du fichier Excel avec gestion des NaN
-        df = pd.read_excel(file_path, engine='openpyxl')
+        # 5. Statistiques globales
+        global_stats = calculate_global_stats(df_clean, all_columns)
         
-        # Remplacer toutes les valeurs NaN par des chaînes vides pour éviter les erreurs JSON
-        df = df.fillna('')
-        
-        print(f"📈 Fichier chargé: {len(df)} entreprises, {len(df.columns)} colonnes")
-        
-        # Patterns de valeurs manquantes spécifiques SIRENE
-        missing_patterns = [
-            '', 
-            'INFORMATION NON-DIFFUSIBLE', 
-            'NON-DIFFUSIBLE',
-            'Non renseigné',
-            'N/A',
-            'nan', 
-            'NaN'
-        ]
-        
-        # Analyse détaillée par colonne
-        analysis = {}
-        total_rows = len(df)
-        
-        for col in df.columns:
-            # Calculer les valeurs manquantes (après fillna, plus de NaN)
-            missing_mask = df[col] == ''  # Cellules vides
-            
-            # Ajouter les patterns spécifiques
-            for pattern in missing_patterns[1:]:  # Exclure '' déjà géré
-                missing_mask |= (df[col].astype(str).str.strip() == pattern)
-            
-            missing_count = missing_mask.sum()
-            present_count = total_rows - missing_count
-            completion_rate = (present_count / total_rows) * 100
-            
-            # Déterminer si enrichissable via LinkedIn
-            enrichable = is_linkedin_enrichable(col)
-            priority = get_enrichment_priority(col, completion_rate, missing_count)
-            
-            # S'assurer que toutes les valeurs sont JSON-compatibles
-            analysis[col] = {
-                "completion_rate": round(float(completion_rate), 1),
-                "missing_count": int(missing_count),
-                "present_count": int(present_count),
-                "linkedin_enrichable": bool(enrichable),
-                "priority": str(priority),
-                "estimated_gain": int(calculate_potential_gain(col, missing_count)) if enrichable else 0
-            }
-        
-        # Identifier les meilleures opportunités
-        linkedin_opportunities = {
-            col: data for col, data in analysis.items()
-            if data["linkedin_enrichable"] and data["missing_count"] > 100  # Au moins 100 manquants
-        }
-        
-        # Statistiques globales avec conversion explicite
-        avg_completion = sum(data["completion_rate"] for data in analysis.values()) / len(analysis)
-        total_missing_fields = sum(data["missing_count"] for data in analysis.values())
-        
-        # Recommandations spécifiques pour gros volume
-        recommendations = generate_batch_recommendations(linkedin_opportunities, total_rows)
-        
-        # S'assurer que le résultat est JSON-compatible
+        # 6. Résultat final
         result = {
-            "status": "✅ ANALYSE AVANCÉE TERMINÉE",
+            "status": "✅ ANALYSE COMPLÈTE TERMINÉE",
             "file_info": {
-                "name": Path(file_path).name,
-                "path": str(file_path),
-                "total_companies": int(total_rows),
-                "total_columns": int(len(df.columns)),
-                "file_size_mb": round(float(Path(file_path).stat().st_size / (1024*1024)), 2)
+                "filename": Path(file_path).name,
+                "total_rows": len(df_clean),
+                "total_columns": len(df_clean.columns),
+                "file_size_mb": round(Path(file_path).stat().st_size / (1024*1024), 2)
             },
-            "global_stats": {
-                "average_completion_rate": round(float(avg_completion), 1),
-                "total_missing_fields": int(total_missing_fields),
-                "fields_per_company": round(float(total_missing_fields / total_rows), 1)
-            },
-            "column_analysis": analysis,
-            "linkedin_opportunities": linkedin_opportunities,
-            "recommendations": recommendations,
-            "batch_strategy": {
-                "recommended_batch_size": int(min(50, max(10, total_rows // 100))),
-                "estimated_processing_time": f"{int((total_rows * 2) // 60)} minutes",
-                "rate_limiting": "2 secondes entre requêtes"
-            },
-            "top_priorities": get_top_priorities(linkedin_opportunities),
-            "sample_companies": get_sample_companies(df, limit=5)
+            "global_stats": global_stats,
+            "all_columns_analysis": all_columns,
+            "enrichment_opportunities": enrichment_opportunities,
+            "sample_data": get_sample_data(df_clean)
         }
         
-        # Validation finale : s'assurer qu'il n'y a pas de NaN dans le résultat
-        return clean_nan_from_dict(result)
+        return result
         
     except Exception as e:
         return {
-            "error": f"Erreur lors de l'analyse avancée: {str(e)}",
-            "file_path": str(file_path) if file_path else "Non spécifié",
-            "error_type": type(e).__name__
+            "error": f"Erreur: {str(e)}",
+            "error_type": type(e).__name__,
+            "file_path": str(file_path) if file_path else "None"
         }
 
-def clean_nan_from_dict(obj):
-    """Nettoie récursivement les valeurs NaN d'un dictionnaire pour la sérialisation JSON"""
-    if isinstance(obj, dict):
-        return {k: clean_nan_from_dict(v) for k, v in obj.items()}
-    elif isinstance(obj, list):
-        return [clean_nan_from_dict(v) for v in obj]
-    elif isinstance(obj, float) and (np.isnan(obj) or np.isinf(obj)):
-        return 0.0  # Remplacer NaN/Inf par 0
-    else:
-        return obj
+def find_excel_file() -> Optional[str]:
+    """Trouve un fichier Excel dans data/raw/"""
+    try:
+        project_root = Path(__file__).parent.parent.parent
+        raw_dir = project_root / "data" / "raw"
+        
+        # Chercher fichiers Excel
+        excel_files = list(raw_dir.glob("*.xlsx")) + list(raw_dir.glob("*.xls"))
+        
+        if excel_files:
+            return str(excel_files[0])  # Prendre le premier trouvé
+        
+        return None
+    except Exception:
+        return None
 
-def is_linkedin_enrichable(column_name: str) -> bool:
-    """Détermine si une colonne peut être enrichie via LinkedIn"""
-    linkedin_fields = {
-        # Sites web - priorité max
-        'site web': True, 'website': True, 'url': True,
-        
-        # Effectifs - très faisable
-        'effectif': True, 'taille': True, 'salaries': True,
-        
-        # Dirigeants - possible
-        'dirigeant': True, 'gérant': True, 'président': True, 'ceo': True,
-        'directeur': True, 'nom': True, 'prénom': True,
-        
-        # Secteur/activité - disponible
-        'activité': True, 'secteur': True, 'industrie': True, 'description': True,
-        
-        # Contacts - parfois disponible
-        'email': True, 'mail': True, 'telephone': True, 'phone': True
+def read_excel_safe(file_path: str) -> pd.DataFrame:
+    """Lecture sécurisée du fichier Excel"""
+    try:
+        df = pd.read_excel(file_path, engine='openpyxl')
+        return df
+    except Exception as e:
+        # Essayer avec xlrd si openpyxl échoue
+        try:
+            df = pd.read_excel(file_path)
+            return df
+        except Exception:
+            raise Exception(f"Impossible de lire le fichier Excel: {str(e)}")
+
+def clean_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+    """Nettoyage basique du DataFrame"""
+    df_clean = df.copy()
+    
+    # Remplacer NaN par chaînes vides
+    df_clean = df_clean.fillna('')
+    
+    # Nettoyer les espaces
+    for col in df_clean.select_dtypes(include=['object']).columns:
+        df_clean[col] = df_clean[col].astype(str).str.strip()
+    
+    return df_clean
+
+def analyze_column(series: pd.Series, col_name: str) -> Dict[str, Any]:
+    """Analyse complète d'une colonne"""
+    
+    # Détecter les valeurs manquantes
+    missing_patterns = detect_missing_patterns(series)
+    missing_count = count_missing_values(series, missing_patterns)
+    
+    total_count = len(series)
+    present_count = total_count - missing_count
+    completion_rate = (present_count / total_count * 100) if total_count > 0 else 0
+    
+    # Analyser le contenu
+    content_analysis = analyze_content(series, missing_patterns)
+    
+    # Détecter le type de colonne
+    column_type = detect_column_type(col_name, series, content_analysis)
+    
+    # Évaluer le potentiel d'enrichissement
+    enrichment_potential = assess_enrichment_potential(col_name, column_type, missing_count)
+    
+    return {
+        "completion_rate": round(completion_rate, 1),
+        "missing_count": missing_count,
+        "present_count": present_count,
+        "missing_patterns_detected": missing_patterns,
+        "content_analysis": content_analysis,
+        "detected_type": column_type,
+        "enrichment_potential": enrichment_potential
+    }
+
+def detect_missing_patterns(series: pd.Series) -> List[str]:
+    """Détecte les patterns de valeurs manquantes"""
+    
+    # Patterns standards
+    standard_patterns = ['', 'nan', 'NaN', 'NULL', 'null', 'N/A', 'n/a', '-', '--']
+    
+    # Compter les valeurs les plus fréquentes
+    value_counts = series.astype(str).str.strip().value_counts()
+    
+    detected_patterns = []
+    
+    # Ajouter les patterns standards trouvés
+    for pattern in standard_patterns:
+        if pattern in value_counts.index:
+            detected_patterns.append(pattern)
+    
+    # Chercher des patterns spécifiques (comme "INFORMATION NON-DIFFUSIBLE")
+    for value, count in value_counts.head(10).items():
+        if count > len(series) * 0.05:  # Si > 5% des valeurs
+            value_upper = str(value).strip().upper()
+            if any(word in value_upper for word in ['INFORMATION', 'NON', 'DIFFUSIBLE', 'RENSEIGNE']):
+                detected_patterns.append(str(value).strip())
+    
+    return list(set(detected_patterns))
+
+def count_missing_values(series: pd.Series, missing_patterns: List[str]) -> int:
+    """Compte les valeurs manquantes selon les patterns détectés"""
+    missing_count = 0
+    
+    for pattern in missing_patterns:
+        missing_count += (series.astype(str).str.strip() == pattern).sum()
+    
+    return missing_count
+
+def analyze_content(series: pd.Series, missing_patterns: List[str]) -> Dict[str, Any]:
+    """Analyse le contenu d'une colonne"""
+    
+    # Filtrer les valeurs non manquantes
+    mask = ~series.astype(str).str.strip().isin(missing_patterns)
+    non_empty = series[mask]
+    
+    if len(non_empty) == 0:
+        return {
+            "unique_values": 0,
+            "avg_length": 0,
+            "sample_values": [],
+            "contains_numbers": False,
+            "contains_emails": False,
+            "contains_urls": False
+        }
+    
+    # Analyses basiques
+    sample_values = non_empty.head(3).astype(str).tolist()
+    
+    # Détecter des patterns dans le contenu
+    text_series = non_empty.astype(str)
+    
+    return {
+        "unique_values": len(non_empty.unique()),
+        "avg_length": round(text_series.str.len().mean(), 1),
+        "sample_values": sample_values,
+        "contains_numbers": text_series.str.contains(r'\d', na=False).any(),
+        "contains_emails": text_series.str.contains('@', na=False).any(),
+        "contains_urls": text_series.str.contains(r'http|www\.', na=False).any(),
+        "most_common": str(non_empty.mode().iloc[0]) if len(non_empty.mode()) > 0 else ""
+    }
+
+def detect_column_type(col_name: str, series: pd.Series, content_analysis: Dict) -> Dict[str, Any]:
+    """Détecte le type d'une colonne"""
+    
+    col_lower = col_name.lower()
+    
+    # Détection par nom de colonne
+    if any(word in col_lower for word in ['siret', 'siren']):
+        category = "identifier"
+    elif any(word in col_lower for word in ['site', 'web', 'url']):
+        category = "web"
+    elif any(word in col_lower for word in ['email', 'mail']):
+        category = "contact_email"
+    elif any(word in col_lower for word in ['telephone', 'phone']):
+        category = "contact_phone"
+    elif any(word in col_lower for word in ['nom', 'denomination', 'raison']):
+        category = "company_name"
+    elif any(word in col_lower for word in ['prenom', 'prénom']):
+        category = "person_name"
+    elif any(word in col_lower for word in ['dirigeant', 'gerant', 'president']):
+        category = "executive"
+    elif any(word in col_lower for word in ['effectif', 'salarie']):
+        category = "workforce"
+    elif any(word in col_lower for word in ['adresse', 'rue', 'voie']):
+        category = "address"
+    elif any(word in col_lower for word in ['commune', 'ville']):
+        category = "location"
+    elif any(word in col_lower for word in ['activite', 'secteur', 'naf']):
+        category = "activity"
+    else:
+        category = "other"
+    
+    # Détecter par contenu si pas trouvé par nom
+    if category == "other":
+        if content_analysis["contains_emails"]:
+            category = "contact_email"
+        elif content_analysis["contains_urls"]:
+            category = "web"
+    
+    return {
+        "category": category,
+        "detection_method": "name_based" if category != "other" else "content_based"
+    }
+
+def assess_enrichment_potential(col_name: str, column_type: Dict, missing_count: int) -> Dict[str, Any]:
+    """Évalue le potentiel d'enrichissement"""
+    
+    category = column_type["category"]
+    
+    # Définir le potentiel selon le type
+    enrichment_config = {
+        "web": {"enrichable": True, "success_rate": 75, "sources": ["LinkedIn", "Google"], "priority": "CRITIQUE"},
+        "contact_email": {"enrichable": True, "success_rate": 60, "sources": ["LinkedIn", "Sites web"], "priority": "HAUTE"},
+        "contact_phone": {"enrichable": True, "success_rate": 50, "sources": ["LinkedIn", "Annuaires"], "priority": "MOYENNE"},
+        "company_name": {"enrichable": True, "success_rate": 70, "sources": ["LinkedIn", "Registres"], "priority": "HAUTE"},
+        "person_name": {"enrichable": True, "success_rate": 55, "sources": ["LinkedIn"], "priority": "MOYENNE"},
+        "executive": {"enrichable": True, "success_rate": 60, "sources": ["LinkedIn"], "priority": "MOYENNE"},
+        "workforce": {"enrichable": True, "success_rate": 65, "sources": ["LinkedIn"], "priority": "MOYENNE"},
+        "activity": {"enrichable": True, "success_rate": 50, "sources": ["LinkedIn", "Sites web"], "priority": "FAIBLE"},
+        "identifier": {"enrichable": False, "success_rate": 5, "sources": [], "priority": "FAIBLE"},
+        "address": {"enrichable": False, "success_rate": 20, "sources": ["APIs"], "priority": "FAIBLE"},
+        "location": {"enrichable": False, "success_rate": 15, "sources": ["APIs"], "priority": "FAIBLE"},
+        "other": {"enrichable": False, "success_rate": 10, "sources": [], "priority": "FAIBLE"}
     }
     
-    column_lower = column_name.lower()
-    return any(term in column_lower for term, enrichable in linkedin_fields.items() if enrichable)
-
-def get_enrichment_priority(column_name: str, completion_rate: float, missing_count: int) -> str:
-    """Calcule la priorité d'enrichissement"""
-    column_lower = column_name.lower()
+    config = enrichment_config.get(category, enrichment_config["other"])
     
-    # Sites web = toujours priorité max si beaucoup manquent
-    if any(term in column_lower for term in ['site', 'web', 'url']) and missing_count > 50:
-        return "🔥 CRITIQUE"
-    
-    # Effectifs avec beaucoup de manquants
-    elif 'effectif' in column_lower and missing_count > 500:
-        return "🟠 HAUTE"
-    
-    # Dirigeants avec beaucoup de manquants  
-    elif any(term in column_lower for term in ['dirigeant', 'nom', 'prénom']) and missing_count > 1000:
-        return "🟡 MOYENNE"
-    
-    # Autres selon taux et volume
-    elif completion_rate < 30 and missing_count > 500:
-        return "🟠 HAUTE"
-    elif completion_rate < 70 and missing_count > 100:
-        return "🟡 MOYENNE"
+    # Ajuster la priorité selon le volume
+    if missing_count > 1000 and config["enrichable"]:
+        priority = "CRITIQUE"
+    elif missing_count > 500 and config["enrichable"]:
+        priority = "HAUTE"
+    elif missing_count > 100 and config["enrichable"]:
+        priority = config["priority"]
     else:
-        return "🟢 FAIBLE"
+        priority = "FAIBLE"
+    
+    estimated_gain = int(missing_count * (config["success_rate"] / 100)) if config["enrichable"] else 0
+    
+    return {
+        "is_enrichable": config["enrichable"],
+        "success_rate": config["success_rate"],
+        "sources": config["sources"],
+        "priority": priority,
+        "estimated_gain": estimated_gain
+    }
 
-def calculate_potential_gain(column_name: str, missing_count: int) -> int:
-    """Estime le nombre d'enrichissements possibles"""
-    column_lower = column_name.lower()
+def calculate_global_stats(df: pd.DataFrame, columns_analysis: Dict) -> Dict[str, Any]:
+    """Calcule les statistiques globales"""
     
-    # Taux de succès estimés selon le type de données
-    if any(term in column_lower for term in ['site', 'web']):
-        success_rate = 0.75  # 75% des entreprises ont un site trouvable
-    elif 'effectif' in column_lower:
-        success_rate = 0.60  # 60% des effectifs trouvables
-    elif any(term in column_lower for term in ['dirigeant', 'nom']):
-        success_rate = 0.50  # 50% des dirigeants trouvables
-    else:
-        success_rate = 0.40  # 40% pour autres données
+    total_cells = len(df) * len(df.columns)
+    total_missing = sum(col["missing_count"] for col in columns_analysis.values())
+    total_filled = total_cells - total_missing
     
-    return int(missing_count * success_rate)
+    overall_completion = (total_filled / total_cells * 100) if total_cells > 0 else 0
+    
+    return {
+        "total_cells": total_cells,
+        "filled_cells": total_filled,
+        "missing_cells": total_missing,
+        "overall_completion_rate": round(overall_completion, 1),
+        "avg_missing_per_row": round(total_missing / len(df), 1) if len(df) > 0 else 0
+    }
 
-def generate_batch_recommendations(opportunities: Dict, total_companies: int) -> List[Dict]:
-    """Génère des recommandations pour traitement par batch"""
-    recommendations = []
+def get_sample_data(df: pd.DataFrame, limit: int = 5) -> List[Dict[str, str]]:
+    """Récupère un échantillon des données"""
     
-    # Sites web
-    web_cols = [col for col in opportunities.keys() if any(term in col.lower() for term in ['site', 'web'])]
-    if web_cols:
-        missing = sum(opportunities[col]["missing_count"] for col in web_cols)
-        gain = sum(opportunities[col]["estimated_gain"] for col in web_cols)
-        
-        recommendations.append({
-            "action": "🌐 Enrichissement sites web",
-            "columns": web_cols,
-            "companies_affected": int(missing),
-            "estimated_success": int(gain),
-            "priority": "🔥 CRITIQUE",
-            "batch_approach": "Traiter par batch de 50 entreprises",
-            "estimated_time": f"{int((missing * 2) // 60)} minutes"
-        })
-    
-    # Effectifs
-    effectif_cols = [col for col in opportunities.keys() if 'effectif' in col.lower()]
-    if effectif_cols:
-        missing = sum(opportunities[col]["missing_count"] for col in effectif_cols)
-        gain = sum(opportunities[col]["estimated_gain"] for col in effectif_cols)
-        
-        recommendations.append({
-            "action": "👥 Mise à jour effectifs",
-            "columns": effectif_cols,
-            "companies_affected": int(missing),
-            "estimated_success": int(gain),
-            "priority": "🟠 HAUTE",
-            "batch_approach": "Traiter en même temps que les sites web"
-        })
-    
-    if not recommendations:
-        recommendations.append({
-            "action": "✅ Données bien remplies",
-            "message": f"Peu d'opportunités d'enrichissement sur {total_companies} entreprises"
-        })
-    
-    return recommendations
-
-def get_top_priorities(opportunities: Dict) -> List[Dict]:
-    """Retourne les 5 colonnes les plus prioritaires"""
-    priority_order = {"🔥 CRITIQUE": 4, "🟠 HAUTE": 3, "🟡 MOYENNE": 2, "🟢 FAIBLE": 1}
-    
-    sorted_opportunities = sorted(
-        opportunities.items(),
-        key=lambda x: (
-            priority_order.get(x[1]["priority"], 0),
-            x[1]["missing_count"]
-        ),
-        reverse=True
-    )
-    
-    return [
-        {
-            "column": str(col),
-            "missing_count": int(data["missing_count"]),
-            "priority": str(data["priority"]),
-            "estimated_gain": int(data["estimated_gain"])
-        }
-        for col, data in sorted_opportunities[:5]
-    ]
-
-def get_sample_companies(df: pd.DataFrame, limit: int = 5) -> List[Dict]:
-    """Retourne un échantillon d'entreprises"""
-    # Colonnes clés à afficher
-    key_columns = []
+    # Identifier les colonnes importantes
+    important_cols = []
     for col in df.columns:
-        if any(term in col.lower() for term in ['siret', 'nom', 'denomination', 'commune']):
-            key_columns.append(col)
+        col_lower = col.lower()
+        if any(word in col_lower for word in ['siret', 'nom', 'denomination', 'commune']):
+            important_cols.append(col)
     
-    if not key_columns:
-        key_columns = df.columns[:5].tolist()
+    # Si pas de colonnes importantes, prendre les 5 premières
+    if not important_cols:
+        important_cols = df.columns[:5].tolist()
     
-    sample = df[key_columns].head(limit)
+    # Échantillon
+    sample = df[important_cols].head(limit)
     
-    # Convertir en dict et nettoyer les NaN
-    result = sample.to_dict('records')
-    return clean_nan_from_dict(result)
+    # Convertir en format simple
+    result = []
+    for _, row in sample.iterrows():
+        row_dict = {}
+        for col in important_cols:
+            value = str(row[col])
+            if len(value) > 40:
+                value = value[:37] + "..."
+            row_dict[col] = value
+        result.append(row_dict)
+    
+    return result
+
+# Alias pour compatibilité
+analyze_data_gaps_advanced = analyze_complete_file
