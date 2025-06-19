@@ -1,0 +1,113 @@
+2025-06-19 15:34:52,303 - INFO - Agent IA initialise - Session: 20250619_153452
+2025-06-19 15:34:52,303 - INFO - 🚀 Démarrage Agent IA - Échantillon 5 entreprises
+2025-06-19 15:34:52,304 - INFO - 📁 Fichier détecté: Non diffusible_2025-04-14.xlsx
+2025-06-19 15:34:52,609 - INFO - 📊 Analyse contexte: {
+  "total_companies": 3101,
+  "columns_count": 27,
+  "has_siret": true,
+  "has_website_column": true,
+  "website_completion": 0.16123831022250887,
+  "website_column": "Site Web \u00e9tablissement"
+}
+2025-06-19 15:34:52,609 - INFO - Selection echantillon optimal (5 entreprises)
+2025-06-19 15:34:52,616 - INFO - Entreprises avec SIRET et commune: 3101/3101
+2025-06-19 15:34:52,617 - INFO - ✅ Pris les 5 premières entreprises (ordre original)
+2025-06-19 15:34:52,620 - INFO - Échantillon final: 5 entreprises (ordre séquentiel)
+2025-06-19 15:34:52,620 - INFO - 📊 Avec nom manquant: 4 (80.0%)
+2025-06-19 15:34:52,621 - INFO - 📊 Avec site manquant: 5 (100.0%)
+2025-06-19 15:34:52,621 - INFO - Premières entreprises sélectionnées (ordre original):
+2025-06-19 15:34:52,623 - INFO -    1. [Ligne 2] SYED SARAH (CHALIFERT) - SIRET: 88980270...
+2025-06-19 15:34:52,623 - INFO -    2. [Ligne 3] INFORMATION NON-DIFFUSIBLE (PONTCARRÉ) - SIRET: 98046605...
+2025-06-19 15:34:52,624 - INFO -    3. [Ligne 4] INFORMATION NON-DIFFUSIBLE (LAGNY-SUR-MARNE) - SIRET: 98047855...
+2025-06-19 15:34:52,625 - INFO -    4. [Ligne 5] INFORMATION NON-DIFFUSIBLE (SAINT-THIBAULT-DES-VIGNES) - SIRET: 98048800...
+2025-06-19 15:34:52,626 - INFO -    5. [Ligne 6] INFORMATION NON-DIFFUSIBLE (CONCHES-SUR-GONDOIRE) - SIRET: 98048854...
+2025-06-19 15:34:52,626 - INFO - 🤖 Début enrichissement IA - Seuil qualité: 85%
+2025-06-19 15:34:52,627 - INFO - 🔍 [1/5] Traitement: SYED SARAH
+2025-06-19 15:34:52,628 - INFO - === DEBUG RECHERCHE MIXTE ===
+2025-06-19 15:34:52,628 - INFO - SIRET: 88980270800012
+2025-06-19 15:34:52,628 - INFO - Nom original: SYED SARAH
+2025-06-19 15:34:52,628 - INFO - Commune: CHALIFERT
+2025-06-19 15:34:52,628 - INFO - TEST API Sirene pour SIRET: 88980270800012
+2025-06-19 15:34:52,702 - WARNING - Erreur connexion API Sirene: ('Connection aborted.', ConnectionResetError(10054, 'Une connexion existante a dû être fermée par l’hôte distant', None, 10054, None))
+2025-06-19 15:34:52,703 - INFO - FALLBACK: API Sirene échouée, utilisation simulation intelligente
+2025-06-19 15:34:52,703 - ERROR - ERREUR CRITIQUE recherche mixte: 'AIEnrichmentAgent' object has no attribute '_intelligent_simulation_fallback'
+2025-06-19 15:34:52,707 - ERROR - Traceback: Traceback (most recent call last):
+  File "C:\Users\charv\Documents\GitHub\Marne-et-Gondoire_IA\mg-platform\mcp_server\tools\ai_agent.py", line 590, in _search_linkedin_ai
+    fallback_result = self._intelligent_simulation_fallback(company_data)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AIEnrichmentAgent' object has no attribute '_intelligent_simulation_fallback'
+
+2025-06-19 15:34:52,707 - WARNING - ❌ Échec - Raison: Erreur technique: 'AIEnrichmentAgent' object has no attribute '_intelligent_simulation_fallback'
+2025-06-19 15:34:55,708 - INFO - 🔍 [2/5] Traitement: INFORMATION NON-DIFFUSIBLE
+2025-06-19 15:34:55,709 - INFO - Nom non disponible, recherche alternative pour SIRET 98046605...
+2025-06-19 15:34:55,710 - INFO - === DEBUG RECHERCHE MIXTE ===
+2025-06-19 15:34:55,710 - INFO - SIRET: 98046605600010
+2025-06-19 15:34:55,711 - INFO - Nom original: INFORMATION NON-DIFFUSIBLE
+2025-06-19 15:34:55,711 - INFO - Commune: PONTCARRÉ
+2025-06-19 15:34:55,712 - INFO - TEST API Sirene pour SIRET: 98046605600010
+2025-06-19 15:34:55,744 - WARNING - Erreur connexion API Sirene: ('Connection aborted.', ConnectionResetError(10054, 'Une connexion existante a dû être fermée par l’hôte distant', None, 10054, None))
+2025-06-19 15:34:55,745 - INFO - FALLBACK: API Sirene échouée, utilisation simulation intelligente
+2025-06-19 15:34:55,745 - ERROR - ERREUR CRITIQUE recherche mixte: 'AIEnrichmentAgent' object has no attribute '_intelligent_simulation_fallback'
+2025-06-19 15:34:55,747 - ERROR - Traceback: Traceback (most recent call last):
+  File "C:\Users\charv\Documents\GitHub\Marne-et-Gondoire_IA\mg-platform\mcp_server\tools\ai_agent.py", line 590, in _search_linkedin_ai
+    fallback_result = self._intelligent_simulation_fallback(company_data)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AIEnrichmentAgent' object has no attribute '_intelligent_simulation_fallback'
+
+2025-06-19 15:34:55,748 - WARNING - ❌ Échec - Raison: Erreur technique: 'AIEnrichmentAgent' object has no attribute '_intelligent_simulation_fallback'
+2025-06-19 15:34:58,751 - INFO - 🔍 [3/5] Traitement: INFORMATION NON-DIFFUSIBLE
+2025-06-19 15:34:58,752 - INFO - Nom non disponible, recherche alternative pour SIRET 98047855...
+2025-06-19 15:34:58,753 - INFO - === DEBUG RECHERCHE MIXTE ===
+2025-06-19 15:34:58,753 - INFO - SIRET: 98047855600015
+2025-06-19 15:34:58,754 - INFO - Nom original: INFORMATION NON-DIFFUSIBLE
+2025-06-19 15:34:58,754 - INFO - Commune: LAGNY-SUR-MARNE
+2025-06-19 15:34:58,755 - INFO - TEST API Sirene pour SIRET: 98047855600015
+2025-06-19 15:34:58,778 - WARNING - Erreur connexion API Sirene: ('Connection aborted.', ConnectionResetError(10054, 'Une connexion existante a dû être fermée par l’hôte distant', None, 10054, None))
+2025-06-19 15:34:58,779 - INFO - FALLBACK: API Sirene échouée, utilisation simulation intelligente
+2025-06-19 15:34:58,779 - ERROR - ERREUR CRITIQUE recherche mixte: 'AIEnrichmentAgent' object has no attribute '_intelligent_simulation_fallback'
+2025-06-19 15:34:58,780 - ERROR - Traceback: Traceback (most recent call last):
+  File "C:\Users\charv\Documents\GitHub\Marne-et-Gondoire_IA\mg-platform\mcp_server\tools\ai_agent.py", line 590, in _search_linkedin_ai
+    fallback_result = self._intelligent_simulation_fallback(company_data)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AIEnrichmentAgent' object has no attribute '_intelligent_simulation_fallback'
+
+2025-06-19 15:34:58,781 - WARNING - ❌ Échec - Raison: Erreur technique: 'AIEnrichmentAgent' object has no attribute '_intelligent_simulation_fallback'
+2025-06-19 15:35:01,782 - INFO - 🔍 [4/5] Traitement: INFORMATION NON-DIFFUSIBLE
+2025-06-19 15:35:01,782 - INFO - Nom non disponible, recherche alternative pour SIRET 98048800...
+2025-06-19 15:35:01,782 - INFO - === DEBUG RECHERCHE MIXTE ===
+2025-06-19 15:35:01,783 - INFO - SIRET: 98048800100010
+2025-06-19 15:35:01,783 - INFO - Nom original: INFORMATION NON-DIFFUSIBLE
+2025-06-19 15:35:01,783 - INFO - Commune: SAINT-THIBAULT-DES-VIGNES
+2025-06-19 15:35:01,783 - INFO - TEST API Sirene pour SIRET: 98048800100010
+2025-06-19 15:35:03,880 - WARNING - Erreur connexion API Sirene: HTTPSConnectionPool(host='entreprise.data.gouv.fr', port=443): Max retries exceeded with url: /api/sirene/v1/siret/98048800100010 (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x0000021B3F7A8050>: Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée'))
+2025-06-19 15:35:03,880 - INFO - FALLBACK: API Sirene échouée, utilisation simulation intelligente
+2025-06-19 15:35:03,881 - ERROR - ERREUR CRITIQUE recherche mixte: 'AIEnrichmentAgent' object has no attribute '_intelligent_simulation_fallback'
+2025-06-19 15:35:03,881 - ERROR - Traceback: Traceback (most recent call last):
+  File "C:\Users\charv\Documents\GitHub\Marne-et-Gondoire_IA\mg-platform\mcp_server\tools\ai_agent.py", line 590, in _search_linkedin_ai
+    fallback_result = self._intelligent_simulation_fallback(company_data)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AIEnrichmentAgent' object has no attribute '_intelligent_simulation_fallback'
+
+2025-06-19 15:35:03,881 - WARNING - ❌ Échec - Raison: Erreur technique: 'AIEnrichmentAgent' object has no attribute '_intelligent_simulation_fallback'
+2025-06-19 15:35:06,882 - INFO - 🔍 [5/5] Traitement: INFORMATION NON-DIFFUSIBLE
+2025-06-19 15:35:06,883 - INFO - Nom non disponible, recherche alternative pour SIRET 98048854...
+2025-06-19 15:35:06,883 - INFO - === DEBUG RECHERCHE MIXTE ===
+2025-06-19 15:35:06,883 - INFO - SIRET: 98048854800010
+2025-06-19 15:35:06,883 - INFO - Nom original: INFORMATION NON-DIFFUSIBLE
+2025-06-19 15:35:06,883 - INFO - Commune: CONCHES-SUR-GONDOIRE
+2025-06-19 15:35:06,883 - INFO - TEST API Sirene pour SIRET: 98048854800010
+2025-06-19 15:35:08,964 - WARNING - Erreur connexion API Sirene: HTTPSConnectionPool(host='entreprise.data.gouv.fr', port=443): Max retries exceeded with url: /api/sirene/v1/siret/98048854800010 (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x0000021B3F7A8550>: Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée'))
+2025-06-19 15:35:08,964 - INFO - FALLBACK: API Sirene échouée, utilisation simulation intelligente
+2025-06-19 15:35:08,965 - ERROR - ERREUR CRITIQUE recherche mixte: 'AIEnrichmentAgent' object has no attribute '_intelligent_simulation_fallback'
+2025-06-19 15:35:08,967 - ERROR - Traceback: Traceback (most recent call last):
+  File "C:\Users\charv\Documents\GitHub\Marne-et-Gondoire_IA\mg-platform\mcp_server\tools\ai_agent.py", line 590, in _search_linkedin_ai
+    fallback_result = self._intelligent_simulation_fallback(company_data)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'AIEnrichmentAgent' object has no attribute '_intelligent_simulation_fallback'
+
+2025-06-19 15:35:08,967 - WARNING - ❌ Échec - Raison: Erreur technique: 'AIEnrichmentAgent' object has no attribute '_intelligent_simulation_fallback'
+2025-06-19 15:35:11,968 - INFO - 🎯 Enrichissement terminé: 0/5 succès
+2025-06-19 15:35:11,970 - INFO - 📋 Format SIRET corrigé pour colonne: SIRET
+2025-06-19 15:35:11,978 - INFO - 📋 Colonne SIRET formatée en TEXTE
+2025-06-19 15:35:11,987 - INFO - 💾 Fichier sauvegardé avec SIRET corrigé: data\processed\AI_ENRICHED_Sample_20250619_153452.xlsx
+2025-06-19 15:35:12,003 - INFO - Fichier colorisé créé: data\processed\AI_ENRICHED_Sample_20250619_153452_COLORIZED.xlsx

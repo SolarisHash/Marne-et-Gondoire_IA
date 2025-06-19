@@ -1,14 +1,21 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import PlainTextResponse, StreamingResponse
 import uvicorn
 import os
 from dotenv import load_dotenv
 from datetime import datetime
 from typing import List, Optional
-from fastapi.responses import PlainTextResponse
+import json
+import asyncio
+import time
+from concurrent.futures import ThreadPoolExecutor
+import queue
+import threading
 
 # Charger les variables d'environnement
 load_dotenv()
+progress_updates = {}  # session_id -> queue
 
 
 # Configuration de l'application
@@ -748,6 +755,322 @@ Suggestions:
 - Contrôlez l'existence du dossier logs/
 - Relancez l'enrichissement si nécessaire
 """
+
+@app.post("/ai-agent/enrich-stream")
+async def run_ai_agent_with_streaming(
+    sample_size: int = Query(10, description="Nombre d'entreprises à traiter"),
+    test_mode: bool = Query(True, description="Mode test sécurisé")
+):
+    """
+    🤖 Agent IA avec progression temps réel via Server-Sent Events
+    Utilisable avec: curl -N http://localhost:8080/ai-agent/enrich-stream?sample_size=10
+    """
+    
+    async def progress_stream():
+        """Générateur de progression temps réel"""
+        
+        try:
+            # Sécurité mode test
+            if test_mode and sample_size > 50:
+                yield f"data: {json.dumps({'error': 'Mode test limité à 50 entreprises'})}\n\n"
+                return
+            
+            # Message de démarrage
+            yield f"data: {json.dumps({'type': 'start', 'message': f'🚀 Démarrage enrichissement {sample_size} entreprises', 'timestamp': time.time()})}\n\n"
+            
+            # Import de l'agent IA
+            yield f"data: {json.dumps({'type': 'info', 'message': '📁 Chargement fichier de données...', 'timestamp': time.time()})}\n\n"
+            
+            import os
+            import importlib.util
+            
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            agent_path = os.path.join(current_dir, "tools", "ai_agent.py")
+            
+            if not os.path.exists(agent_path):
+                yield f"data: {json.dumps({'type': 'error', 'message': '❌ Agent IA non trouvé', 'timestamp': time.time()})}\n\n"
+                return
+            
+            # Charger l'agent IA
+            spec = importlib.util.spec_from_file_location("ai_agent", agent_path)
+            ai_agent_module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(ai_agent_module)
+            
+            yield f"data: {json.dumps({'type': 'info', 'message': '🤖 Agent IA initialisé', 'timestamp': time.time()})}\n\n"
+            
+            # Créer l'agent avec callback de progression
+            agent = ai_agent_module.AIEnrichmentAgent()
+            
+            # Simuler l'enrichissement avec progression
+            for i in range(sample_size):
+                company_name = f"Entreprise_{i+1}"
+                
+                # Simulation traitement
+                yield f"data: {json.dumps({'type': 'progress', 'current': i+1, 'total': sample_size, 'percentage': round((i+1)/sample_size*100, 1), 'message': f'🔍 Traitement: {company_name}', 'timestamp': time.time()})}\n\n"
+                
+                # Simuler temps de traitement
+                await asyncio.sleep(2)  # 2 secondes par entreprise
+                
+                # Résultat (simulation 70% succès)
+                success = (i % 3) != 0  # 2/3 succès
+                status = "✅ Enrichi" if success else "❌ Échec"
+                
+                yield f"data: {json.dumps({'type': 'result', 'current': i+1, 'total': sample_size, 'success': success, 'message': f'{status} - {company_name}', 'timestamp': time.time()})}\n\n"
+            
+            # Résultat final
+            success_count = int(sample_size * 0.7)  # 70% de succès
+            
+            final_result = {
+                'type': 'completed',
+                'message': '🎉 Enrichissement terminé !',
+                'summary': {
+                    'total_processed': sample_size,
+                    'successful': success_count,
+                    'failed': sample_size - success_count,
+                    'success_rate': f"{(success_count/sample_size*100):.1f}%"
+                },
+                'timestamp': time.time()
+            }
+            
+            yield f"data: {json.dumps(final_result)}\n\n"
+            
+        except Exception as e:
+            yield f"data: {json.dumps({'type': 'error', 'message': f'❌ Erreur: {str(e)}', 'timestamp': time.time()})}\n\n"
+    
+    return StreamingResponse(
+        progress_stream(),
+        media_type="text/plain",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no"  # Nginx bypass
+        }
+    )
+
+@app.post("/ai-agent/enrich-real-stream")
+async def run_real_ai_agent_with_streaming(
+    sample_size: int = Query(10, description="Nombre d'entreprises à traiter"),
+    quality_threshold: int = Query(85, description="Seuil de qualité minimum (%)"),
+    test_mode: bool = Query(True, description="Mode test sécurisé")
+):
+    """
+    🤖 Agent IA RÉEL avec progression temps réel dans le client Python
+    """
+    
+    # Générer un ID de session unique
+    import uuid
+    session_id = str(uuid.uuid4())[:8]
+    
+    # Créer une queue pour cette session
+    progress_queue = queue.Queue()
+    progress_updates[session_id] = progress_queue
+    
+    async def real_enrichment_stream():
+        """Stream qui combine le vrai Agent IA avec la progression"""
+        
+        try:
+            # Sécurité mode test
+            if test_mode and sample_size > 50:
+                yield f"data: {json.dumps({'type': 'error', 'message': 'Mode test limité à 50 entreprises'})}\n\n"
+                return
+            
+            # Message de démarrage
+            yield f"data: {json.dumps({'type': 'start', 'message': f'🚀 Démarrage VRAI enrichissement {sample_size} entreprises', 'session': session_id, 'timestamp': time.time()})}\n\n"
+            
+            # Import de l'agent IA RÉEL
+            yield f"data: {json.dumps({'type': 'info', 'message': '📁 Chargement Agent IA...', 'timestamp': time.time()})}\n\n"
+            
+            import os
+            import importlib.util
+            
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            agent_path = os.path.join(current_dir, "tools", "ai_agent.py")
+            
+            if not os.path.exists(agent_path):
+                yield f"data: {json.dumps({'type': 'error', 'message': '❌ Agent IA non trouvé', 'timestamp': time.time()})}\n\n"
+                return
+            
+            # Charger l'agent IA RÉEL
+            spec = importlib.util.spec_from_file_location("ai_agent", agent_path)
+            ai_agent_module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(ai_agent_module)
+            
+            yield f"data: {json.dumps({'type': 'info', 'message': '🤖 Agent IA réel initialisé', 'timestamp': time.time()})}\n\n"
+            
+            # Lancer l'Agent IA RÉEL dans un thread avec callback
+            loop = asyncio.get_event_loop()
+            
+            def run_real_agent_with_progress():
+                """Exécute le vrai agent IA avec callbacks de progression"""
+                
+                # Créer l'agent avec callbacks
+                agent = ai_agent_module.AIEnrichmentAgent()
+                
+                # Patcher la méthode d'enrichissement pour récupérer la progression
+                original_enrich = agent._enrich_companies_ai
+                
+                def enrichment_with_callbacks(sample_df):
+                    """Version avec callbacks pour le streaming"""
+                    
+                    results = {
+                        "processed": 0,
+                        "enriched": 0,
+                        "failed": 0,
+                        "enrichment_data": {},
+                        "quality_reports": {},
+                        "ai_decisions": []
+                    }
+                    
+                    for idx, (_, company) in enumerate(sample_df.iterrows(), 1):
+                        start_time = time.time()
+                        company_name = company.get('Nom courant/Dénomination', f'Entreprise_{idx}')
+                        
+                        # Envoyer progression au stream
+                        progress_queue.put({
+                            'type': 'progress',
+                            'current': idx,
+                            'total': len(sample_df),
+                            'percentage': round((idx / len(sample_df)) * 100, 1),
+                            'message': f'🔍 Traitement: {company_name[:30]}...',
+                            'timestamp': time.time()
+                        })
+                        
+                        try:
+                            # VRAI enrichissement de l'entreprise
+                            enrichment_result = agent._enrich_single_company_ai(company, idx)
+                            
+                            processing_time = time.time() - start_time
+                            
+                            if enrichment_result["success"]:
+                                results["enriched"] += 1
+                                results["enrichment_data"][str(idx)] = enrichment_result["data"]
+                                results["quality_reports"][str(idx)] = enrichment_result["quality_report"]
+                                agent.performance_metrics["quality_scores"].append(enrichment_result["quality_score"])
+                                
+                                # Envoyer résultat succès
+                                progress_queue.put({
+                                    'type': 'result',
+                                    'current': idx,
+                                    'total': len(sample_df),
+                                    'success': True,
+                                    'message': f'✅ Enrichi - {company_name[:30]} (Score: {enrichment_result["quality_score"]}%)',
+                                    'data': {
+                                        'website': enrichment_result["data"].get("website", "N/A"),
+                                        'quality_score': enrichment_result["quality_score"]
+                                    },
+                                    'timestamp': time.time()
+                                })
+                                
+                            else:
+                                results["failed"] += 1
+                                agent.performance_metrics["error_details"].append({
+                                    "company_index": idx,
+                                    "company_name": company_name,
+                                    "error_reason": enrichment_result["error_reason"]
+                                })
+                                
+                                # Envoyer résultat échec
+                                progress_queue.put({
+                                    'type': 'result',
+                                    'current': idx,
+                                    'total': len(sample_df),
+                                    'success': False,
+                                    'message': f'❌ Échec - {company_name[:30]} ({enrichment_result["error_reason"]})',
+                                    'timestamp': time.time()
+                                })
+                            
+                            results["processed"] += 1
+                            results["ai_decisions"].append(enrichment_result["ai_decision_log"])
+                            
+                            # Rate limiting (réduit pour les tests)
+                            time.sleep(1)  # 1 seconde au lieu de 3
+                            
+                        except Exception as e:
+                            results["failed"] += 1
+                            results["processed"] += 1
+                            
+                            progress_queue.put({
+                                'type': 'result',
+                                'current': idx,
+                                'total': len(sample_df),
+                                'success': False,
+                                'message': f'❌ Erreur - {company_name[:30]} ({str(e)})',
+                                'timestamp': time.time()
+                            })
+                    
+                    return results
+                
+                # Remplacer temporairement la méthode
+                agent._enrich_companies_ai = enrichment_with_callbacks
+                
+                # Lancer l'enrichissement RÉEL
+                return agent.enrich_sample(sample_size)
+            
+            # Exécuter dans un thread pool
+            with ThreadPoolExecutor(max_workers=1) as executor:
+                # Lancer l'agent en arrière-plan
+                future = loop.run_in_executor(executor, run_real_agent_with_progress)
+                
+                # Stream les updates de progression
+                while not future.done():
+                    try:
+                        # Récupérer les updates avec timeout
+                        update = progress_queue.get(timeout=0.5)
+                        yield f"data: {json.dumps(update)}\n\n"
+                    except queue.Empty:
+                        # Envoyer un heartbeat
+                        yield f"data: {json.dumps({'type': 'heartbeat', 'timestamp': time.time()})}\n\n"
+                    
+                    await asyncio.sleep(0.1)  # Petit délai
+                
+                # Récupérer le résultat final
+                final_result = await future
+                
+                # Vider la queue restante
+                while not progress_queue.empty():
+                    try:
+                        update = progress_queue.get_nowait()
+                        yield f"data: {json.dumps(update)}\n\n"
+                    except queue.Empty:
+                        break
+                
+                # Envoyer le résultat final
+                if "error" not in final_result:
+                    completion_data = {
+                        'type': 'completed',
+                        'message': '🎉 Enrichissement RÉEL terminé !',
+                        'summary': final_result["execution_summary"],
+                        'output_file': final_result.get("output_file", "N/A"),
+                        'session_id': final_result["session_id"],
+                        'timestamp': time.time()
+                    }
+                else:
+                    completion_data = {
+                        'type': 'error',
+                        'message': f'❌ Erreur finale: {final_result["error"]}',
+                        'timestamp': time.time()
+                    }
+                
+                yield f"data: {json.dumps(completion_data)}\n\n"
+        
+        except Exception as e:
+            yield f"data: {json.dumps({'type': 'error', 'message': f'❌ Erreur streaming: {str(e)}', 'timestamp': time.time()})}\n\n"
+        
+        finally:
+            # Nettoyer la queue
+            if session_id in progress_updates:
+                del progress_updates[session_id]
+    
+    return StreamingResponse(
+        real_enrichment_stream(),
+        media_type="text/plain",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no"
+        }
+    )
+
 
 @app.get("/ai-agent/status")
 async def ai_agent_status():

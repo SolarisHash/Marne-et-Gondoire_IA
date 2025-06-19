@@ -1,0 +1,80 @@
+2025-06-19 15:10:36,454 - INFO - Agent IA initialise - Session: 20250619_151036
+2025-06-19 15:10:36,454 - INFO - 🚀 Démarrage Agent IA - Échantillon 5 entreprises
+2025-06-19 15:10:36,455 - INFO - 📁 Fichier détecté: Non diffusible_2025-04-14.xlsx
+2025-06-19 15:10:36,761 - INFO - 📊 Analyse contexte: {
+  "total_companies": 3101,
+  "columns_count": 27,
+  "has_siret": true,
+  "has_website_column": true,
+  "website_completion": 0.16123831022250887,
+  "website_column": "Site Web \u00e9tablissement"
+}
+2025-06-19 15:10:36,761 - INFO - Selection echantillon optimal (5 entreprises)
+2025-06-19 15:10:36,769 - INFO - Entreprises avec SIRET et commune: 3101/3101
+2025-06-19 15:10:36,769 - INFO - ✅ Pris les 5 premières entreprises (ordre original)
+2025-06-19 15:10:36,773 - INFO - Échantillon final: 5 entreprises (ordre séquentiel)
+2025-06-19 15:10:36,773 - INFO - 📊 Avec nom manquant: 4 (80.0%)
+2025-06-19 15:10:36,773 - INFO - 📊 Avec site manquant: 5 (100.0%)
+2025-06-19 15:10:36,774 - INFO - Premières entreprises sélectionnées (ordre original):
+2025-06-19 15:10:36,774 - INFO -    1. [Ligne 2] SYED SARAH (CHALIFERT) - SIRET: 88980270...
+2025-06-19 15:10:36,775 - INFO -    2. [Ligne 3] INFORMATION NON-DIFFUSIBLE (PONTCARRÉ) - SIRET: 98046605...
+2025-06-19 15:10:36,775 - INFO -    3. [Ligne 4] INFORMATION NON-DIFFUSIBLE (LAGNY-SUR-MARNE) - SIRET: 98047855...
+2025-06-19 15:10:36,775 - INFO -    4. [Ligne 5] INFORMATION NON-DIFFUSIBLE (SAINT-THIBAULT-DES-VIGNES) - SIRET: 98048800...
+2025-06-19 15:10:36,775 - INFO -    5. [Ligne 6] INFORMATION NON-DIFFUSIBLE (CONCHES-SUR-GONDOIRE) - SIRET: 98048854...
+2025-06-19 15:10:36,776 - INFO - 🤖 Début enrichissement IA - Seuil qualité: 85%
+2025-06-19 15:10:36,776 - INFO - 🔍 [1/5] Traitement: SYED SARAH
+2025-06-19 15:10:36,776 - INFO - Recherche Mixte IA pour SIRET: 88980270...
+2025-06-19 15:10:36,776 - INFO - Requête API Sirene pour SIRET: 88980270800012
+2025-06-19 15:10:36,831 - WARNING - Erreur connexion API Sirene: ('Connection aborted.', ConnectionResetError(10054, 'Une connexion existante a dû être fermée par l’hôte distant', None, 10054, None))
+2025-06-19 15:10:36,831 - INFO - Nom de recherche IA généré: CHALIFERT activités poste
+2025-06-19 15:10:36,831 - INFO - Recherche site web IA pour: CHALIFERT activités poste
+2025-06-19 15:10:36,832 - INFO - Recherche web IA (1/2): "CHALIFERT activités poste" CHALIFERT site officiel
+2025-06-19 15:10:37,363 - INFO - DuckDuckGo: 0 résultats trouvés
+2025-06-19 15:10:38,364 - INFO - Recherche web IA (2/2): "CHALIFERT activités poste" CHALIFERT www
+2025-06-19 15:10:38,890 - INFO - DuckDuckGo: 0 résultats trouvés
+2025-06-19 15:10:39,892 - WARNING - ❌ Échec - Raison: Aucune donnée fiable trouvée via API + recherche IA
+2025-06-19 15:10:42,893 - INFO - 🔍 [2/5] Traitement: INFORMATION NON-DIFFUSIBLE
+2025-06-19 15:10:42,894 - INFO - Nom non disponible, recherche alternative pour SIRET 98046605...
+2025-06-19 15:10:42,895 - INFO - Recherche Mixte IA pour SIRET: 98046605...
+2025-06-19 15:10:42,895 - INFO - Requête API Sirene pour SIRET: 98046605600010
+2025-06-19 15:10:44,988 - WARNING - Erreur connexion API Sirene: HTTPSConnectionPool(host='entreprise.data.gouv.fr', port=443): Max retries exceeded with url: /api/sirene/v1/siret/98046605600010 (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x00000229CDF9E990>: Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée'))
+2025-06-19 15:10:44,994 - INFO - Nom de recherche IA généré: PONTCARRÉ activités spécialisées,
+2025-06-19 15:10:44,994 - INFO - Recherche site web IA pour: PONTCARRÉ activités spécialisées,
+2025-06-19 15:10:44,995 - INFO - Recherche web IA (1/2): "PONTCARRÉ activités spécialisées," PONTCARRÉ site officiel
+2025-06-19 15:10:46,125 - INFO - Recherche web IA (2/2): "PONTCARRÉ activités spécialisées," PONTCARRÉ www
+2025-06-19 15:10:47,267 - WARNING - ❌ Échec - Raison: Aucune donnée fiable trouvée via API + recherche IA
+2025-06-19 15:10:50,274 - INFO - 🔍 [3/5] Traitement: INFORMATION NON-DIFFUSIBLE
+2025-06-19 15:10:50,275 - INFO - Nom non disponible, recherche alternative pour SIRET 98047855...
+2025-06-19 15:10:50,277 - INFO - Recherche Mixte IA pour SIRET: 98047855...
+2025-06-19 15:10:50,277 - INFO - Requête API Sirene pour SIRET: 98047855600015
+2025-06-19 15:10:52,383 - WARNING - Erreur connexion API Sirene: HTTPSConnectionPool(host='entreprise.data.gouv.fr', port=443): Max retries exceeded with url: /api/sirene/v1/siret/98047855600015 (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x00000229CDF9F390>: Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée'))
+2025-06-19 15:10:52,384 - INFO - Nom de recherche IA généré: LAGNY-SUR-MARNE administratifs combinés
+2025-06-19 15:10:52,386 - INFO - Recherche site web IA pour: LAGNY-SUR-MARNE administratifs combinés
+2025-06-19 15:10:52,386 - INFO - Recherche web IA (1/2): "LAGNY-SUR-MARNE administratifs combinés" LAGNY-SUR-MARNE site officiel
+2025-06-19 15:10:53,530 - INFO - Recherche web IA (2/2): "LAGNY-SUR-MARNE administratifs combinés" LAGNY-SUR-MARNE www
+2025-06-19 15:10:54,657 - WARNING - ❌ Échec - Raison: Aucune donnée fiable trouvée via API + recherche IA
+2025-06-19 15:10:57,658 - INFO - 🔍 [4/5] Traitement: INFORMATION NON-DIFFUSIBLE
+2025-06-19 15:10:57,658 - INFO - Nom non disponible, recherche alternative pour SIRET 98048800...
+2025-06-19 15:10:57,658 - INFO - Recherche Mixte IA pour SIRET: 98048800...
+2025-06-19 15:10:57,659 - INFO - Requête API Sirene pour SIRET: 98048800100010
+2025-06-19 15:10:57,682 - WARNING - Erreur connexion API Sirene: ('Connection aborted.', ConnectionResetError(10054, 'Une connexion existante a dû être fermée par l’hôte distant', None, 10054, None))
+2025-06-19 15:10:57,684 - INFO - Nom de recherche IA généré: SAINT-THIBAULT-DES-VIGNES transports voyageurs
+2025-06-19 15:10:57,684 - INFO - Recherche site web IA pour: SAINT-THIBAULT-DES-VIGNES transports voyageurs
+2025-06-19 15:10:57,684 - INFO - Recherche web IA (1/2): "SAINT-THIBAULT-DES-VIGNES transports voyageurs" SAINT-THIBAULT-DES-VIGNES site officiel
+2025-06-19 15:10:58,830 - INFO - Recherche web IA (2/2): "SAINT-THIBAULT-DES-VIGNES transports voyageurs" SAINT-THIBAULT-DES-VIGNES www
+2025-06-19 15:10:59,975 - WARNING - ❌ Échec - Raison: Aucune donnée fiable trouvée via API + recherche IA
+2025-06-19 15:11:02,976 - INFO - 🔍 [5/5] Traitement: INFORMATION NON-DIFFUSIBLE
+2025-06-19 15:11:02,977 - INFO - Nom non disponible, recherche alternative pour SIRET 98048854...
+2025-06-19 15:11:02,980 - INFO - Recherche Mixte IA pour SIRET: 98048854...
+2025-06-19 15:11:02,981 - INFO - Requête API Sirene pour SIRET: 98048854800010
+2025-06-19 15:11:05,084 - WARNING - Erreur connexion API Sirene: HTTPSConnectionPool(host='entreprise.data.gouv.fr', port=443): Max retries exceeded with url: /api/sirene/v1/siret/98048854800010 (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x00000229CDF9FC50>: Failed to establish a new connection: [WinError 10061] Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée'))
+2025-06-19 15:11:05,086 - INFO - Nom de recherche IA généré: CONCHES-SUR-GONDOIRE activités santé
+2025-06-19 15:11:05,086 - INFO - Recherche site web IA pour: CONCHES-SUR-GONDOIRE activités santé
+2025-06-19 15:11:05,087 - INFO - Recherche web IA (1/2): "CONCHES-SUR-GONDOIRE activités santé" CONCHES-SUR-GONDOIRE site officiel
+2025-06-19 15:11:06,242 - INFO - Recherche web IA (2/2): "CONCHES-SUR-GONDOIRE activités santé" CONCHES-SUR-GONDOIRE www
+2025-06-19 15:11:07,378 - WARNING - ❌ Échec - Raison: Aucune donnée fiable trouvée via API + recherche IA
+2025-06-19 15:11:10,393 - INFO - 🎯 Enrichissement terminé: 0/5 succès
+2025-06-19 15:11:10,396 - INFO - 📋 Format SIRET corrigé pour colonne: SIRET
+2025-06-19 15:11:10,413 - INFO - 📋 Colonne SIRET formatée en TEXTE
+2025-06-19 15:11:10,434 - INFO - 💾 Fichier sauvegardé avec SIRET corrigé: data\processed\AI_ENRICHED_Sample_20250619_151036.xlsx
+2025-06-19 15:11:10,477 - INFO - Fichier colorisé créé: data\processed\AI_ENRICHED_Sample_20250619_151036_COLORIZED.xlsx
