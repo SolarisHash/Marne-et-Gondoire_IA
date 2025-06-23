@@ -1,0 +1,122 @@
+2025-06-23 11:11:31,283 - INFO - Agent IA initialise - Session: 20250623_111131
+2025-06-23 11:11:31,283 - INFO - 🚀 Démarrage Agent IA - Échantillon 5 entreprises
+2025-06-23 11:11:31,284 - INFO - 📁 Fichier détecté: Non diffusible_2025-04-14.xlsx
+2025-06-23 11:11:31,546 - INFO - 📊 Analyse contexte: {
+  "total_companies": 3101,
+  "columns_count": 27,
+  "has_siret": true,
+  "has_website_column": true,
+  "website_completion": 0.16123831022250887,
+  "website_column": "Site Web \u00e9tablissement"
+}
+2025-06-23 11:11:31,547 - INFO - Selection echantillon optimal (5 entreprises)
+2025-06-23 11:11:31,551 - INFO - Entreprises avec SIRET et commune: 3101/3101
+2025-06-23 11:11:31,551 - INFO - ✅ Pris les 5 premières entreprises (ordre original)
+2025-06-23 11:11:31,554 - INFO - Échantillon final: 5 entreprises (ordre séquentiel)
+2025-06-23 11:11:31,554 - INFO - 📊 Avec nom manquant: 4 (80.0%)
+2025-06-23 11:11:31,554 - INFO - 📊 Avec site manquant: 5 (100.0%)
+2025-06-23 11:11:31,554 - INFO - Premières entreprises sélectionnées (ordre original):
+2025-06-23 11:11:31,555 - INFO -    1. [Ligne 2] SYED SARAH (CHALIFERT) - SIRET: 88980270...
+2025-06-23 11:11:31,555 - INFO -    2. [Ligne 3] INFORMATION NON-DIFFUSIBLE (PONTCARRÉ) - SIRET: 98046605...
+2025-06-23 11:11:31,555 - INFO -    3. [Ligne 4] INFORMATION NON-DIFFUSIBLE (LAGNY-SUR-MARNE) - SIRET: 98047855...
+2025-06-23 11:11:31,555 - INFO -    4. [Ligne 5] INFORMATION NON-DIFFUSIBLE (SAINT-THIBAULT-DES-VIGNES) - SIRET: 98048800...
+2025-06-23 11:11:31,555 - INFO -    5. [Ligne 6] INFORMATION NON-DIFFUSIBLE (CONCHES-SUR-GONDOIRE) - SIRET: 98048854...
+2025-06-23 11:11:31,555 - INFO - 🤖 Début enrichissement IA - Seuil qualité: 85%
+2025-06-23 11:11:31,556 - INFO - 🔍 [1/5] Traitement: SYED SARAH
+2025-06-23 11:11:31,556 - INFO - Enrichissement pratique - SIRET: 88980270... | Nom: SYED SARAH | Commune: CHALIFERT
+2025-06-23 11:11:31,556 - INFO - Amélioration données existantes: SYED SARAH
+2025-06-23 11:11:31,556 - INFO - SUCCESS: Données existantes améliorées
+2025-06-23 11:11:31,556 - INFO - Recherche web RÉELLE: Syed Sarah à CHALIFERT
+2025-06-23 11:11:31,556 - INFO - Recherche DuckDuckGo: "Syed Sarah" CHALIFERT site officiel
+2025-06-23 11:11:32,125 - INFO - DuckDuckGo: 0 sites trouvés
+2025-06-23 11:11:34,126 - INFO - Recherche DuckDuckGo: "Syed Sarah" CHALIFERT
+2025-06-23 11:11:34,749 - INFO - DuckDuckGo: 1 sites trouvés
+2025-06-23 11:11:37,184 - INFO - Google: 0 sites trouvés
+2025-06-23 11:11:37,184 - INFO - ❌ Aucun site web réel trouvé pour Syed Sarah
+2025-06-23 11:11:37,184 - WARNING - FALLBACK: Génération site plausible pour Syed Sarah (aucun site réel trouvé)
+2025-06-23 11:11:37,185 - WARNING - ⚠️ SITE PLAUSIBLE GÉNÉRÉ (NON VÉRIFIÉ): https://www.syed-sarah.fr
+2025-06-23 11:11:37,185 - INFO - Site plausible généré: https://www.syed-sarah.fr
+2025-06-23 11:11:37,185 - INFO - Score de confiance pratique: 100%
+2025-06-23 11:11:37,185 - INFO - VALIDATION RÉUSSIE: 100% >= 60%
+2025-06-23 11:11:37,185 - INFO - ✅ Succès - Score: 100%
+2025-06-23 11:11:40,186 - INFO - 🔍 [2/5] Traitement: INFORMATION NON-DIFFUSIBLE
+2025-06-23 11:11:40,187 - INFO - Nom non disponible, recherche alternative pour SIRET 98046605...
+2025-06-23 11:11:40,187 - INFO - Enrichissement pratique - SIRET: 98046605... | Nom: INFORMATION NON-DIFFUSIBLE | Commune: PONTCARRÉ
+2025-06-23 11:11:40,188 - INFO - Enrichissement intelligent pour entreprise anonyme à PONTCARRÉ
+2025-06-23 11:11:40,188 - INFO - SUCCESS: Enrichissement intelligent - Pontcarré Services
+2025-06-23 11:11:40,189 - INFO - Recherche web RÉELLE: Pontcarré Services à PONTCARRÉ
+2025-06-23 11:11:40,189 - INFO - Recherche DuckDuckGo: "Pontcarré Services" PONTCARRÉ site officiel
+2025-06-23 11:11:40,323 - WARNING - DuckDuckGo HTTP 202
+2025-06-23 11:11:42,324 - INFO - Recherche DuckDuckGo: "Pontcarré Services" PONTCARRÉ
+2025-06-23 11:11:42,454 - WARNING - DuckDuckGo HTTP 202
+2025-06-23 11:11:44,658 - INFO - Google: 0 sites trouvés
+2025-06-23 11:11:44,659 - INFO - ❌ Aucun site web réel trouvé pour Pontcarré Services
+2025-06-23 11:11:44,659 - WARNING - FALLBACK: Génération site plausible pour Pontcarré Services (aucun site réel trouvé)
+2025-06-23 11:11:44,659 - WARNING - ⚠️ SITE PLAUSIBLE GÉNÉRÉ (NON VÉRIFIÉ): https://pontcarr-services.wixsite.com/pontcarr-services
+2025-06-23 11:11:44,659 - INFO - Site plausible généré: https://pontcarr-services.wixsite.com/pontcarr-services
+2025-06-23 11:11:44,660 - INFO - Score de confiance pratique: 100%
+2025-06-23 11:11:44,660 - INFO - VALIDATION RÉUSSIE: 100% >= 60%
+2025-06-23 11:11:44,660 - INFO - Seuil adapte pour recherche alternative: 60%
+2025-06-23 11:11:44,660 - INFO - ✅ Succès - Score: 100%
+2025-06-23 11:11:47,661 - INFO - 🔍 [3/5] Traitement: INFORMATION NON-DIFFUSIBLE
+2025-06-23 11:11:47,662 - INFO - Nom non disponible, recherche alternative pour SIRET 98047855...
+2025-06-23 11:11:47,663 - INFO - Enrichissement pratique - SIRET: 98047855... | Nom: INFORMATION NON-DIFFUSIBLE | Commune: LAGNY-SUR-MARNE
+2025-06-23 11:11:47,664 - INFO - Enrichissement intelligent pour entreprise anonyme à LAGNY-SUR-MARNE
+2025-06-23 11:11:47,664 - INFO - SUCCESS: Enrichissement intelligent - Entreprise Lagny Sur Marne
+2025-06-23 11:11:47,665 - INFO - Recherche web RÉELLE: Entreprise Lagny Sur Marne à LAGNY-SUR-MARNE
+2025-06-23 11:11:47,665 - INFO - Recherche DuckDuckGo: "Entreprise Lagny Sur Marne" LAGNY-SUR-MARNE site officiel
+2025-06-23 11:11:47,817 - WARNING - DuckDuckGo HTTP 202
+2025-06-23 11:11:49,818 - INFO - Recherche DuckDuckGo: "Entreprise Lagny Sur Marne" LAGNY-SUR-MARNE
+2025-06-23 11:11:49,941 - WARNING - DuckDuckGo HTTP 202
+2025-06-23 11:11:52,137 - INFO - Google: 0 sites trouvés
+2025-06-23 11:11:52,137 - INFO - ❌ Aucun site web réel trouvé pour Entreprise Lagny Sur Marne
+2025-06-23 11:11:52,137 - WARNING - FALLBACK: Génération site plausible pour Entreprise Lagny Sur Marne (aucun site réel trouvé)
+2025-06-23 11:11:52,138 - WARNING - ⚠️ SITE PLAUSIBLE GÉNÉRÉ (NON VÉRIFIÉ): https://entreprise-lagny-sur-marne.wixsite.com/entreprise-lagny-sur-marne
+2025-06-23 11:11:52,138 - INFO - Site plausible généré: https://entreprise-lagny-sur-marne.wixsite.com/entreprise-lagny-sur-marne
+2025-06-23 11:11:52,138 - INFO - Score de confiance pratique: 100%
+2025-06-23 11:11:52,138 - INFO - VALIDATION RÉUSSIE: 100% >= 60%
+2025-06-23 11:11:52,138 - INFO - Seuil adapte pour recherche alternative: 60%
+2025-06-23 11:11:52,139 - INFO - ✅ Succès - Score: 100%
+2025-06-23 11:11:55,139 - INFO - 🔍 [4/5] Traitement: INFORMATION NON-DIFFUSIBLE
+2025-06-23 11:11:55,140 - INFO - Nom non disponible, recherche alternative pour SIRET 98048800...
+2025-06-23 11:11:55,140 - INFO - Enrichissement pratique - SIRET: 98048800... | Nom: INFORMATION NON-DIFFUSIBLE | Commune: SAINT-THIBAULT-DES-VIGNES
+2025-06-23 11:11:55,141 - INFO - Enrichissement intelligent pour entreprise anonyme à SAINT-THIBAULT-DES-VIGNES
+2025-06-23 11:11:55,141 - INFO - SUCCESS: Enrichissement intelligent - Société Saint Thibault Des Vignes
+2025-06-23 11:11:55,141 - INFO - Recherche web RÉELLE: Société Saint Thibault Des Vignes à SAINT-THIBAULT-DES-VIGNES
+2025-06-23 11:11:55,141 - INFO - Recherche DuckDuckGo: "Société Saint Thibault Des Vignes" SAINT-THIBAULT-DES-VIGNES site officiel
+2025-06-23 11:11:55,283 - WARNING - DuckDuckGo HTTP 202
+2025-06-23 11:11:57,284 - INFO - Recherche DuckDuckGo: "Société Saint Thibault Des Vignes" SAINT-THIBAULT-DES-VIGNES
+2025-06-23 11:11:57,480 - WARNING - DuckDuckGo HTTP 202
+2025-06-23 11:11:59,670 - INFO - Google: 0 sites trouvés
+2025-06-23 11:11:59,672 - INFO - ❌ Aucun site web réel trouvé pour Société Saint Thibault Des Vignes
+2025-06-23 11:11:59,673 - WARNING - FALLBACK: Génération site plausible pour Société Saint Thibault Des Vignes (aucun site réel trouvé)
+2025-06-23 11:11:59,673 - WARNING - ⚠️ SITE PLAUSIBLE GÉNÉRÉ (NON VÉRIFIÉ): https://socit-saint-thibault.business.site
+2025-06-23 11:11:59,673 - INFO - Site plausible généré: https://socit-saint-thibault.business.site
+2025-06-23 11:11:59,674 - INFO - Score de confiance pratique: 100%
+2025-06-23 11:11:59,674 - INFO - VALIDATION RÉUSSIE: 100% >= 60%
+2025-06-23 11:11:59,674 - INFO - Seuil adapte pour recherche alternative: 60%
+2025-06-23 11:11:59,674 - INFO - ✅ Succès - Score: 100%
+2025-06-23 11:12:02,675 - INFO - 🔍 [5/5] Traitement: INFORMATION NON-DIFFUSIBLE
+2025-06-23 11:12:02,676 - INFO - Nom non disponible, recherche alternative pour SIRET 98048854...
+2025-06-23 11:12:02,676 - INFO - Enrichissement pratique - SIRET: 98048854... | Nom: INFORMATION NON-DIFFUSIBLE | Commune: CONCHES-SUR-GONDOIRE
+2025-06-23 11:12:02,676 - INFO - Enrichissement intelligent pour entreprise anonyme à CONCHES-SUR-GONDOIRE
+2025-06-23 11:12:02,677 - INFO - SUCCESS: Enrichissement intelligent - Société Conches Sur Gondoire
+2025-06-23 11:12:02,677 - INFO - Recherche web RÉELLE: Société Conches Sur Gondoire à CONCHES-SUR-GONDOIRE
+2025-06-23 11:12:02,677 - INFO - Recherche DuckDuckGo: "Société Conches Sur Gondoire" CONCHES-SUR-GONDOIRE site officiel
+2025-06-23 11:12:02,801 - WARNING - DuckDuckGo HTTP 202
+2025-06-23 11:12:04,802 - INFO - Recherche DuckDuckGo: "Société Conches Sur Gondoire" CONCHES-SUR-GONDOIRE
+2025-06-23 11:12:04,930 - WARNING - DuckDuckGo HTTP 202
+2025-06-23 11:12:07,145 - INFO - Google: 0 sites trouvés
+2025-06-23 11:12:07,147 - INFO - ❌ Aucun site web réel trouvé pour Société Conches Sur Gondoire
+2025-06-23 11:12:07,147 - WARNING - FALLBACK: Génération site plausible pour Société Conches Sur Gondoire (aucun site réel trouvé)
+2025-06-23 11:12:07,148 - WARNING - ⚠️ SITE PLAUSIBLE GÉNÉRÉ (NON VÉRIFIÉ): https://socit-conches-sur-gondoire.business.site
+2025-06-23 11:12:07,148 - INFO - Site plausible généré: https://socit-conches-sur-gondoire.business.site
+2025-06-23 11:12:07,149 - INFO - Score de confiance pratique: 100%
+2025-06-23 11:12:07,149 - INFO - VALIDATION RÉUSSIE: 100% >= 60%
+2025-06-23 11:12:07,150 - INFO - Seuil adapte pour recherche alternative: 60%
+2025-06-23 11:12:07,150 - INFO - ✅ Succès - Score: 100%
+2025-06-23 11:12:10,151 - INFO - 🎯 Enrichissement terminé: 5/5 succès
+2025-06-23 11:12:10,159 - INFO - 📋 Format SIRET corrigé pour colonne: SIRET
+2025-06-23 11:12:10,198 - INFO - 📋 Colonne SIRET formatée en TEXTE
+2025-06-23 11:12:10,215 - INFO - 💾 Fichier sauvegardé avec SIRET corrigé: data\processed\AI_ENRICHED_Sample_20250623_111131.xlsx
+2025-06-23 11:12:10,235 - INFO - Fichier colorisé créé: data\processed\AI_ENRICHED_Sample_20250623_111131_COLORIZED.xlsx

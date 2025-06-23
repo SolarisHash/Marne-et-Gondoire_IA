@@ -1,0 +1,82 @@
+2025-06-19 16:51:38,287 - INFO - Agent IA initialise - Session: 20250619_165138
+2025-06-19 16:51:38,287 - INFO - 🚀 Démarrage Agent IA - Échantillon 5 entreprises
+2025-06-19 16:51:38,288 - INFO - 📁 Fichier détecté: Non diffusible_2025-04-14.xlsx
+2025-06-19 16:51:38,721 - INFO - 📊 Analyse contexte: {
+  "total_companies": 3101,
+  "columns_count": 27,
+  "has_siret": true,
+  "has_website_column": true,
+  "website_completion": 0.16123831022250887,
+  "website_column": "Site Web \u00e9tablissement"
+}
+2025-06-19 16:51:38,721 - INFO - Selection echantillon optimal (5 entreprises)
+2025-06-19 16:51:38,731 - INFO - Entreprises avec SIRET et commune: 3101/3101
+2025-06-19 16:51:38,731 - INFO - ✅ Pris les 5 premières entreprises (ordre original)
+2025-06-19 16:51:38,736 - INFO - Échantillon final: 5 entreprises (ordre séquentiel)
+2025-06-19 16:51:38,736 - INFO - 📊 Avec nom manquant: 4 (80.0%)
+2025-06-19 16:51:38,737 - INFO - 📊 Avec site manquant: 5 (100.0%)
+2025-06-19 16:51:38,737 - INFO - Premières entreprises sélectionnées (ordre original):
+2025-06-19 16:51:38,738 - INFO -    1. [Ligne 2] SYED SARAH (CHALIFERT) - SIRET: 88980270...
+2025-06-19 16:51:38,738 - INFO -    2. [Ligne 3] INFORMATION NON-DIFFUSIBLE (PONTCARRÉ) - SIRET: 98046605...
+2025-06-19 16:51:38,740 - INFO -    3. [Ligne 4] INFORMATION NON-DIFFUSIBLE (LAGNY-SUR-MARNE) - SIRET: 98047855...
+2025-06-19 16:51:38,740 - INFO -    4. [Ligne 5] INFORMATION NON-DIFFUSIBLE (SAINT-THIBAULT-DES-VIGNES) - SIRET: 98048800...
+2025-06-19 16:51:38,741 - INFO -    5. [Ligne 6] INFORMATION NON-DIFFUSIBLE (CONCHES-SUR-GONDOIRE) - SIRET: 98048854...
+2025-06-19 16:51:38,741 - INFO - 🤖 Début enrichissement IA - Seuil qualité: 85%
+2025-06-19 16:51:38,741 - INFO - 🔍 [1/5] Traitement: SYED SARAH
+2025-06-19 16:51:38,741 - INFO - Enrichissement pratique - SIRET: 88980270... | Nom: SYED SARAH | Commune: CHALIFERT
+2025-06-19 16:51:38,741 - INFO - Amélioration données existantes: SYED SARAH
+2025-06-19 16:51:38,742 - INFO - SUCCESS: Données existantes améliorées
+2025-06-19 16:51:38,742 - INFO - Recherche web locale: Syed Sarah à CHALIFERT
+2025-06-19 16:51:38,742 - INFO - Site web trouvé: https://syed-sarah.com
+2025-06-19 16:51:38,742 - INFO - Score de confiance pratique: 100%
+2025-06-19 16:51:38,742 - INFO - VALIDATION RÉUSSIE: 100% >= 60%
+2025-06-19 16:51:38,742 - INFO - ✅ Succès - Score: 100%
+2025-06-19 16:51:41,743 - INFO - 🔍 [2/5] Traitement: INFORMATION NON-DIFFUSIBLE
+2025-06-19 16:51:41,744 - INFO - Nom non disponible, recherche alternative pour SIRET 98046605...
+2025-06-19 16:51:41,744 - INFO - Enrichissement pratique - SIRET: 98046605... | Nom: INFORMATION NON-DIFFUSIBLE | Commune: PONTCARRÉ
+2025-06-19 16:51:41,745 - INFO - Enrichissement intelligent pour entreprise anonyme à PONTCARRÉ
+2025-06-19 16:51:41,745 - INFO - SUCCESS: Enrichissement intelligent - Pontcarré Services
+2025-06-19 16:51:41,746 - INFO - Recherche web locale: Pontcarré Services à PONTCARRÉ
+2025-06-19 16:51:41,746 - INFO - Site web trouvé: https://pontcarr-services.com
+2025-06-19 16:51:41,747 - INFO - Score de confiance pratique: 100%
+2025-06-19 16:51:41,747 - INFO - VALIDATION RÉUSSIE: 100% >= 60%
+2025-06-19 16:51:41,748 - INFO - Seuil adapte pour recherche alternative: 60%
+2025-06-19 16:51:41,748 - INFO - ✅ Succès - Score: 100%
+2025-06-19 16:51:44,750 - INFO - 🔍 [3/5] Traitement: INFORMATION NON-DIFFUSIBLE
+2025-06-19 16:51:44,750 - INFO - Nom non disponible, recherche alternative pour SIRET 98047855...
+2025-06-19 16:51:44,750 - INFO - Enrichissement pratique - SIRET: 98047855... | Nom: INFORMATION NON-DIFFUSIBLE | Commune: LAGNY-SUR-MARNE
+2025-06-19 16:51:44,751 - INFO - Enrichissement intelligent pour entreprise anonyme à LAGNY-SUR-MARNE
+2025-06-19 16:51:44,751 - INFO - SUCCESS: Enrichissement intelligent - Entreprise Lagny Sur Marne
+2025-06-19 16:51:44,751 - INFO - Recherche web locale: Entreprise Lagny Sur Marne à LAGNY-SUR-MARNE
+2025-06-19 16:51:44,752 - INFO - Site plausible généré: https://sites.google.com/view/entreprise-lagny-sur-marne
+2025-06-19 16:51:44,752 - INFO - Score de confiance pratique: 100%
+2025-06-19 16:51:44,752 - INFO - VALIDATION RÉUSSIE: 100% >= 60%
+2025-06-19 16:51:44,753 - INFO - Seuil adapte pour recherche alternative: 60%
+2025-06-19 16:51:44,753 - INFO - ✅ Succès - Score: 100%
+2025-06-19 16:51:47,754 - INFO - 🔍 [4/5] Traitement: INFORMATION NON-DIFFUSIBLE
+2025-06-19 16:51:47,755 - INFO - Nom non disponible, recherche alternative pour SIRET 98048800...
+2025-06-19 16:51:47,755 - INFO - Enrichissement pratique - SIRET: 98048800... | Nom: INFORMATION NON-DIFFUSIBLE | Commune: SAINT-THIBAULT-DES-VIGNES
+2025-06-19 16:51:47,756 - INFO - Enrichissement intelligent pour entreprise anonyme à SAINT-THIBAULT-DES-VIGNES
+2025-06-19 16:51:47,756 - INFO - SUCCESS: Enrichissement intelligent - Saint Thibault Des Vignes Services
+2025-06-19 16:51:47,756 - INFO - Recherche web locale: Saint Thibault Des Vignes Services à SAINT-THIBAULT-DES-VIGNES
+2025-06-19 16:51:47,757 - INFO - Site web trouvé: https://saint-thibault-des.wixsite.com/saint-thibault-des
+2025-06-19 16:51:47,757 - INFO - Score de confiance pratique: 100%
+2025-06-19 16:51:47,757 - INFO - VALIDATION RÉUSSIE: 100% >= 60%
+2025-06-19 16:51:47,757 - INFO - Seuil adapte pour recherche alternative: 60%
+2025-06-19 16:51:47,757 - INFO - ✅ Succès - Score: 100%
+2025-06-19 16:51:50,758 - INFO - 🔍 [5/5] Traitement: INFORMATION NON-DIFFUSIBLE
+2025-06-19 16:51:50,758 - INFO - Nom non disponible, recherche alternative pour SIRET 98048854...
+2025-06-19 16:51:50,759 - INFO - Enrichissement pratique - SIRET: 98048854... | Nom: INFORMATION NON-DIFFUSIBLE | Commune: CONCHES-SUR-GONDOIRE
+2025-06-19 16:51:50,759 - INFO - Enrichissement intelligent pour entreprise anonyme à CONCHES-SUR-GONDOIRE
+2025-06-19 16:51:50,760 - INFO - SUCCESS: Enrichissement intelligent - Conches Sur Gondoire Services
+2025-06-19 16:51:50,760 - INFO - Recherche web locale: Conches Sur Gondoire Services à CONCHES-SUR-GONDOIRE
+2025-06-19 16:51:50,761 - INFO - Site plausible généré: https://sites.google.com/view/conches-sur-gondoire-services
+2025-06-19 16:51:50,761 - INFO - Score de confiance pratique: 100%
+2025-06-19 16:51:50,761 - INFO - VALIDATION RÉUSSIE: 100% >= 60%
+2025-06-19 16:51:50,761 - INFO - Seuil adapte pour recherche alternative: 60%
+2025-06-19 16:51:50,761 - INFO - ✅ Succès - Score: 100%
+2025-06-19 16:51:53,762 - INFO - 🎯 Enrichissement terminé: 5/5 succès
+2025-06-19 16:51:53,765 - INFO - 📋 Format SIRET corrigé pour colonne: SIRET
+2025-06-19 16:51:53,771 - INFO - 📋 Colonne SIRET formatée en TEXTE
+2025-06-19 16:51:53,778 - INFO - 💾 Fichier sauvegardé avec SIRET corrigé: data\processed\AI_ENRICHED_Sample_20250619_165138.xlsx
+2025-06-19 16:51:53,788 - INFO - Fichier colorisé créé: data\processed\AI_ENRICHED_Sample_20250619_165138_COLORIZED.xlsx

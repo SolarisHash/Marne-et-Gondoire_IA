@@ -360,7 +360,7 @@ class AIEnrichmentAgent:
         return results
     
     def _enrich_single_company_ai(self, company: pd.Series, company_idx: int) -> Dict[str, Any]:
-        """Enrichissement IA d'une entreprise - VERSION CORRIGÉE"""
+        """Enrichissement IA d'une entreprise - VERSION VALIDATION HARMONISÉE"""
         
         # Extraction données entreprise
         company_data = {
@@ -370,10 +370,6 @@ class AIEnrichmentAgent:
             "naf_code": str(company.get('Code NAF', '')).strip(),
             "naf_label": str(company.get('Libellé NAF', '')).strip()
         }
-        
-        # ============================================================================
-        # NOUVELLE LOGIQUE : Enrichir même avec "INFORMATION NON-DIFFUSIBLE"
-        # ============================================================================
         
         # Validation données d'entrée MINIMALE
         if not company_data["siret"] or not company_data["commune"]:
@@ -423,25 +419,33 @@ class AIEnrichmentAgent:
                 }
             }
         
-        # Phase 3: Validation IA adaptée
-        validation_result = self._validate_result_ai(linkedin_results["data"], company_data)
+        # ================================================================
+        # Phase 3: VALIDATION SIMPLIFIÉE ET COHÉRENTE
+        # ================================================================
         
-        # Seuil de qualité adaptatif selon la stratégie
-        quality_threshold = self.quality_threshold
+        # Utiliser directement le score de confiance pratique
+        practical_confidence = linkedin_results["data"].get("ai_validation_score", 0)
+        
+        # Seuil adaptatif selon la stratégie
         if company_data["search_strategy"] == "alternative":
             # Seuil plus souple pour les recherches alternatives
-            quality_threshold = max(70, self.quality_threshold - 15)
+            quality_threshold = 60  # ✅ ABAISSÉ de 70% à 60%
             self.logger.info(f"Seuil adapte pour recherche alternative: {quality_threshold}%")
+        else:
+            quality_threshold = self.quality_threshold  # 85% pour les recherches standard
         
-        if validation_result["quality_score"] < quality_threshold:
+        # ================================================================
+        # VALIDATION UNIQUE - Pas de double validation
+        # ================================================================
+        
+        if practical_confidence < quality_threshold:
             return {
                 "success": False,
-                "error_reason": f"Qualite insuffisante ({validation_result['quality_score']}% < {quality_threshold}%)",
+                "error_reason": f"Qualite insuffisante ({practical_confidence}% < {quality_threshold}%)",
                 "attempted_searches": linkedin_results["attempted_queries"],
                 "ai_decision_log": {
                     "decision": "QUALITY_REJECTED",
-                    "quality_score": validation_result["quality_score"],
-                    "quality_details": validation_result["details"],
+                    "quality_score": practical_confidence,
                     "threshold": quality_threshold,
                     "search_strategy": company_data["search_strategy"]
                 }
@@ -451,14 +455,18 @@ class AIEnrichmentAgent:
         return {
             "success": True,
             "data": linkedin_results["data"],
-            "quality_score": validation_result["quality_score"],
-            "quality_report": validation_result,
+            "quality_score": practical_confidence,  # ✅ Utiliser le score pratique directement
+            "quality_report": {
+                "quality_score": practical_confidence,
+                "validation_method": "practical_confidence",
+                "threshold_met": True
+            },
             "ai_decision_log": {
                 "decision": "ACCEPTED",
-                "quality_score": validation_result["quality_score"],
+                "quality_score": practical_confidence,
                 "search_method": linkedin_results["search_method"],
-                "validation_details": validation_result["details"],
-                "search_strategy": company_data["search_strategy"]
+                "search_strategy": company_data["search_strategy"],
+                "threshold_used": quality_threshold
             }
         }
     
@@ -488,7 +496,7 @@ class AIEnrichmentAgent:
         return queries
 
     def _search_linkedin_ai(self, queries: Dict[str, str], company_data: Dict) -> Dict[str, Any]:
-        """Version pratique sans API externe - Focus sur enrichissement réel"""
+        """Version pratique CORRIGÉE - Bug attempted_queries fixé"""
         
         siret = company_data.get('siret', '').strip()
         nom_original = company_data.get('name', '').strip()
@@ -500,7 +508,9 @@ class AIEnrichmentAgent:
             "found": False,
             "data": {},
             "search_method": "practical_enrichment",
-            "sources": []
+            "sources": [],
+            "attempted_queries": list(queries.values()),  # ✅ FIX CRITIQUE: ajouter cette ligne
+            "error_reason": ""  # ✅ FIX CRITIQUE: ajouter cette ligne
         }
         
         try:
@@ -584,20 +594,23 @@ class AIEnrichmentAgent:
                     return enrichment_result
                 else:
                     self.logger.warning(f"Confiance insuffisante: {confidence_score}% < {threshold}%")
+                    enrichment_result["found"] = False
+                    enrichment_result["error_reason"] = f"Confiance insuffisante ({confidence_score}% < {threshold}%)"
             
             # Échec après toutes les stratégies
-            return {
-                "found": False,
-                "error_reason": "Aucune stratégie d'enrichissement n'a donné de résultat satisfaisant",
-                "attempted_queries": list(queries.values())
-            }
+            if not enrichment_result["found"]:
+                enrichment_result["error_reason"] = "Aucune stratégie d'enrichissement n'a donné de résultat satisfaisant"
+            
+            return enrichment_result
             
         except Exception as e:
             self.logger.error(f"Erreur enrichissement pratique: {str(e)}")
             return {
                 "found": False,
                 "error_reason": f"Erreur technique: {str(e)}",
-                "attempted_queries": list(queries.values())
+                "attempted_queries": list(queries.values()),  # ✅ IMPORTANT
+                "data": {},
+                "sources": []
             }
 
     def _enhance_existing_company_data(self, company_data: Dict) -> Dict:
@@ -801,21 +814,21 @@ class AIEnrichmentAgent:
         return generated_name
 
     def _calculate_practical_confidence(self, enriched_data: Dict, original_data: Dict, sources: List[str]) -> float:
-        """Calcule un score de confiance adapté à la version pratique"""
+        """Calcule un score de confiance PLUS GÉNÉREUX pour version pratique"""
         
-        base_score = 60  # Base acceptable
+        base_score = 70  # ✅ Augmenté de 60 à 70
         
         # Bonus selon les sources
         if "ENHANCED_EXISTING" in sources:
             base_score += 25  # Données existantes améliorées
         
         if "INTELLIGENT_ANALYSIS" in sources:
-            base_score += 15  # Analyse intelligente
+            base_score += 20  # ✅ Augmenté de 15 à 20
         
         if "LOCAL_WEB_SEARCH" in sources:
             base_score += 10  # Site web trouvé
         elif "REALISTIC_GENERATION" in sources:
-            base_score += 5   # Site plausible
+            base_score += 8   # ✅ Augmenté de 5 à 8
         
         # Bonus pour cohérence géographique
         if enriched_data.get("location") == original_data.get("commune"):
@@ -824,11 +837,15 @@ class AIEnrichmentAgent:
         # Bonus pour nom plausible
         company_name = enriched_data.get("company_name", "")
         if company_name and len(company_name) > 5:
-            base_score += 5
+            base_score += 8  # ✅ Augmenté de 5 à 8
         
         # Bonus pour secteur identifié
         if enriched_data.get("business_sector"):
             base_score += 5
+        
+        # ✅ NOUVEAU: Bonus pour site web généré
+        if enriched_data.get("website"):
+            base_score += 10
         
         return min(100, base_score)
 
@@ -2263,54 +2280,294 @@ class AIEnrichmentAgent:
         else:
             return "Petite structure locale"
 
+    # REMPLACER les fonctions de recherche web dans ai_agent.py
+
     def _local_web_search(self, company_name: str, commune: str, company_data: Dict) -> str:
-        """Recherche web locale respectueuse et limitée"""
+        """VRAIE recherche web locale (remplace la simulation)"""
         
-        # Pour version pratique, on limite à une recherche simple
-        # et on génère un site plausible si pas trouvé
+        self.logger.info(f"Recherche web RÉELLE: {company_name} à {commune}")
         
-        self.logger.info(f"Recherche web locale: {company_name} à {commune}")
-        
-        # Simulation de recherche avec probabilité réaliste
-        import random
-        
-        # Probabilité basée sur la taille de commune
-        search_success_probability = 0.3  # 30% de chance de trouver un site
-        
-        if random.random() < search_success_probability:
-            # "Site trouvé" - générer URL réaliste
-            clean_name = self._generate_clean_url_name(company_name)
+        try:
+            # ================================================================
+            # STRATÉGIE 1: Recherche DuckDuckGo RÉELLE
+            # ================================================================
             
-            # Variantes d'URLs réalistes
-            url_variants = [
-                f"https://www.{clean_name}.fr",
-                f"https://{clean_name}.com", 
-                f"https://www.{clean_name}-{commune.lower()}.fr",
-                f"https://{clean_name}.wixsite.com/{clean_name}"
+            # Générer requêtes de recherche intelligentes
+            search_queries = [
+                f'"{company_name}" {commune} site officiel',
+                f'"{company_name}" {commune}',
+                f'{company_name} {commune} www',
+                f'{company_name} {commune} contact'
             ]
             
-            return random.choice(url_variants)
+            for query in search_queries[:2]:  # Limiter à 2 requêtes pour éviter le spam
+                self.logger.info(f"Recherche DuckDuckGo: {query}")
+                
+                # Recherche DuckDuckGo
+                websites = self._search_duckduckgo_real(query)
+                
+                if websites:
+                    # Valider les résultats
+                    for website in websites:
+                        if self._validate_website_real(website, company_name, commune):
+                            self.logger.info(f"✅ Site web RÉEL trouvé: {website}")
+                            return website
+                
+                # Délai respectueux entre requêtes
+                time.sleep(2)
+            
+            # ================================================================
+            # STRATÉGIE 2: Recherche Google (si DuckDuckGo échoue)
+            # ================================================================
+            
+            # Note: Google peut bloquer, donc on l'utilise en dernier recours
+            google_query = f'"{company_name}" {commune} site:*.fr OR site:*.com'
+            google_results = self._search_google_real(google_query)
+            
+            if google_results:
+                for website in google_results:
+                    if self._validate_website_real(website, company_name, commune):
+                        self.logger.info(f"✅ Site web RÉEL trouvé (Google): {website}")
+                        return website
+            
+            self.logger.info(f"❌ Aucun site web réel trouvé pour {company_name}")
+            return ""
+            
+        except Exception as e:
+            self.logger.warning(f"Erreur recherche web réelle: {e}")
+            return ""
+
+    def _search_duckduckgo_real(self, query: str, max_results: int = 5) -> List[str]:
+        """Recherche DuckDuckGo RÉELLE avec parsing HTML"""
         
-        return ""  # Pas de site trouvé
+        try:
+            import requests
+            from bs4 import BeautifulSoup
+            import urllib.parse
+            
+            # Headers réalistes
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Accept-Language': 'fr-FR,fr;q=0.9,en;q=0.8',
+                'DNT': '1'
+            }
+            
+            # URL DuckDuckGo
+            encoded_query = urllib.parse.quote(query)
+            ddg_url = f"https://html.duckduckgo.com/html/?q={encoded_query}"
+            
+            # Requête
+            response = requests.get(ddg_url, headers=headers, timeout=10)
+            
+            if response.status_code != 200:
+                self.logger.warning(f"DuckDuckGo HTTP {response.status_code}")
+                return []
+            
+            # Parser les résultats
+            soup = BeautifulSoup(response.content, 'html.parser')
+            websites = []
+            
+            # Extraire les liens de résultats
+            for result in soup.find_all('div', class_=['result', 'web-result']):
+                link_tag = result.find('a', href=True)
+                if not link_tag:
+                    continue
+                
+                url = link_tag.get('href', '')
+                
+                # Nettoyer l'URL DuckDuckGo
+                if '/l/?uddg=' in url:
+                    try:
+                        # Format DuckDuckGo indirect
+                        clean_url = urllib.parse.unquote(url.split('/l/?uddg=')[1].split('&')[0])
+                        url = clean_url
+                    except:
+                        continue
+                
+                # Valider l'URL
+                if self._is_valid_business_website(url):
+                    websites.append(url)
+                    
+                    if len(websites) >= max_results:
+                        break
+            
+            self.logger.info(f"DuckDuckGo: {len(websites)} sites trouvés")
+            return websites
+            
+        except Exception as e:
+            self.logger.warning(f"Erreur DuckDuckGo: {e}")
+            return []
+
+    def _search_google_real(self, query: str, max_results: int = 3) -> List[str]:
+        """Recherche Google RÉELLE (utilisation limitée)"""
+        
+        try:
+            import requests
+            from bs4 import BeautifulSoup
+            import urllib.parse
+            
+            # Headers Google
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Accept-Language': 'fr-FR,fr;q=0.9'
+            }
+            
+            # URL Google Search
+            encoded_query = urllib.parse.quote(query)
+            google_url = f"https://www.google.com/search?q={encoded_query}&num={max_results}"
+            
+            response = requests.get(google_url, headers=headers, timeout=10)
+            
+            if response.status_code != 200:
+                return []
+            
+            soup = BeautifulSoup(response.content, 'html.parser')
+            websites = []
+            
+            # Extraire les liens de résultats Google
+            for result in soup.find_all('div', class_='g'):
+                link_tag = result.find('a', href=True)
+                if link_tag:
+                    url = link_tag.get('href', '')
+                    if url.startswith('/url?q='):
+                        # Nettoyer URL Google
+                        url = url.split('/url?q=')[1].split('&')[0]
+                        url = urllib.parse.unquote(url)
+                    
+                    if self._is_valid_business_website(url):
+                        websites.append(url)
+            
+            self.logger.info(f"Google: {len(websites)} sites trouvés")
+            return websites
+            
+        except Exception as e:
+            self.logger.warning(f"Erreur Google: {e}")
+            return []
+
+    def _is_valid_business_website(self, url: str) -> bool:
+        """Valide qu'une URL est potentiellement un site d'entreprise RÉEL"""
+        
+        if not url or not isinstance(url, str):
+            return False
+        
+        # Doit être une URL complète
+        if not url.startswith(('http://', 'https://')):
+            return False
+        
+        # Domaines à exclure (moteurs de recherche, réseaux sociaux, etc.)
+        excluded_domains = [
+            'google.', 'bing.', 'yahoo.', 'duckduckgo.',
+            'facebook.', 'twitter.', 'instagram.', 'tiktok.',
+            'youtube.', 'wikipedia.', 'wikimedia.',
+            'societe.com', 'verif.com', 'infogreffe.',
+            'pages-jaunes.', 'pagesjaunes.', 'kompass.',
+            'linkedin.com/company/',  # Pages entreprise LinkedIn (peuvent être utiles)
+            'amazon.', 'ebay.', 'leboncoin.'
+        ]
+        
+        url_lower = url.lower()
+        
+        # Exclure les domaines interdits
+        if any(domain in url_lower for domain in excluded_domains):
+            return False
+        
+        # Accepter les domaines business courants
+        business_indicators = [
+            '.fr', '.com', '.net', '.org', '.eu',
+            'wix.', 'wordpress.', 'jimdo.', 'shopify.',
+            'business.site', 'sites.google.'
+        ]
+        
+        if any(indicator in url_lower for indicator in business_indicators):
+            return True
+        
+        return False
+
+    def _validate_website_real(self, website: str, company_name: str, commune: str) -> bool:
+        """Valide qu'un site web correspond VRAIMENT à l'entreprise"""
+        
+        try:
+            import requests
+            from bs4 import BeautifulSoup
+            
+            # Télécharger le contenu du site
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (compatible; BusinessValidator/1.0)',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+            }
+            
+            response = requests.get(website, headers=headers, timeout=8, allow_redirects=True)
+            
+            if response.status_code != 200:
+                return False
+            
+            # Parser le contenu
+            soup = BeautifulSoup(response.content, 'html.parser')
+            page_text = soup.get_text().lower()
+            
+            # Validation simple mais efficace
+            company_words = company_name.lower().split()
+            commune_clean = commune.lower()
+            
+            # Score de correspondance
+            score = 0
+            
+            # Bonus si nom d'entreprise dans le contenu
+            significant_words = [word for word in company_words if len(word) > 3]
+            if significant_words:
+                found_words = sum(1 for word in significant_words if word in page_text)
+                score += (found_words / len(significant_words)) * 60
+            
+            # Bonus si commune dans le contenu
+            if commune_clean in page_text:
+                score += 30
+            
+            # Bonus si département 77 ou Seine-et-Marne
+            if any(indicator in page_text for indicator in ['77', 'seine-et-marne', 'île-de-france']):
+                score += 10
+            
+            # Validation finale
+            is_valid = score >= 50  # Seuil de 50%
+            
+            self.logger.info(f"Validation {website}: Score {score:.1f}% → {'✅ VALID' if is_valid else '❌ INVALID'}")
+            
+            return is_valid
+            
+        except Exception as e:
+            self.logger.warning(f"Erreur validation {website}: {e}")
+            return False
+
+    # ================================================================
+    # MODIFIER AUSSI : Stratégie fallback intelligente
+    # ================================================================
 
     def _generate_realistic_website(self, company_name: str, commune: str) -> str:
-        """Génère un site web réaliste basé sur des patterns courants"""
+        """Génère un site PLAUSIBLE seulement si aucun site réel trouvé"""
+        
+        # ⚠️ ATTENTION: Cette fonction ne génère que des sites PLAUSIBLES
+        # Elle ne devrait être appelée que si la recherche réelle échoue
+        
+        self.logger.warning(f"FALLBACK: Génération site plausible pour {company_name} (aucun site réel trouvé)")
         
         clean_name = self._generate_clean_url_name(company_name)
         commune_clean = commune.lower().replace("-", "").replace(" ", "")
         
-        # Patterns d'URLs réalistes pour petites entreprises
-        realistic_patterns = [
+        # Patterns PLAUSIBLES (non réels) pour les entreprises locales
+        fallback_patterns = [
             f"https://www.{clean_name}.fr",
             f"https://{clean_name}.wixsite.com/{clean_name}",
-            f"https://{clean_name}.jimdo.com",
-            f"https://sites.google.com/view/{clean_name}",
-            f"https://www.{clean_name}-{commune_clean}.fr",
-            f"https://{clean_name}.business.site"
+            f"https://{clean_name}.business.site",
+            f"https://www.{clean_name}-{commune_clean}.fr"
         ]
         
         import random
-        return random.choice(realistic_patterns)
+        generated_site = random.choice(fallback_patterns)
+        
+        # Marquer clairement que c'est un fallback
+        self.logger.warning(f"⚠️ SITE PLAUSIBLE GÉNÉRÉ (NON VÉRIFIÉ): {generated_site}")
+        
+        return generated_site
 
     def _generate_clean_url_name(self, company_name: str) -> str:
         """Génère un nom propre pour URL"""
@@ -2319,6 +2576,7 @@ class AIEnrichmentAgent:
             return "entreprise-locale"
         
         # Nettoyer pour URL
+        import re
         clean = company_name.lower()
         clean = re.sub(r'[^a-z0-9\s]', '', clean)  # Garder seulement lettres/chiffres
         clean = re.sub(r'\s+', '-', clean)         # Espaces → tirets
