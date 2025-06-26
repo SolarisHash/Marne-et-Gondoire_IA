@@ -1,0 +1,1210 @@
+{
+  "extraction_info": {
+    "script_version": "1.0",
+    "extraction_successful": true,
+    "extraction_date": "2025-06-26T14:46:35.502643"
+  },
+  "file_info": {
+    "file_path": "data\\raw\\Non diffusible_2025-04-14.xlsx",
+    "file_name": "Non diffusible_2025-04-14.xlsx",
+    "file_size_mb": 0.4,
+    "total_rows": 3101,
+    "total_columns": 27,
+    "analysis_date": "2025-06-26T14:46:35.233234"
+  },
+  "global_statistics": {
+    "total_cells": 83727,
+    "filled_cells": 59999,
+    "missing_cells": 23728,
+    "global_completion_rate": 71.66,
+    "enrichable_columns": 3,
+    "total_enrichment_potential": 6520
+  },
+  "columns_analysis": {
+    "Numéro de fiche": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 3101,
+        "missing_count": 0,
+        "completion_rate": 100.0,
+        "unique_values": 1958,
+        "avg_length": 5.0
+      },
+      "content_analysis": {
+        "sample_values": [
+          "27898",
+          "37635",
+          "37637",
+          "37639",
+          "37653"
+        ],
+        "most_common_value": "38412",
+        "most_common_count": 17,
+        "contains_numbers": "True",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "numeric",
+        "detection_method": "content_based",
+        "keywords_matched": [
+          "numeric_pattern"
+        ]
+      },
+      "missing_patterns_found": [],
+      "enrichment_potential": {
+        "is_enrichable": false,
+        "priority": "FAIBLE",
+        "success_rate": 10,
+        "estimated_gain": 0,
+        "potential_sources": [],
+        "recommendation": "Non enrichissable automatiquement"
+      }
+    },
+    "SIRET": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 3101,
+        "missing_count": 0,
+        "completion_rate": 100.0,
+        "unique_values": 1958,
+        "avg_length": 14.0
+      },
+      "content_analysis": {
+        "sample_values": [
+          "88980270800012",
+          "98046605600010",
+          "98047855600015",
+          "98048800100010",
+          "98048854800010"
+        ],
+        "most_common_value": "41528592300041",
+        "most_common_count": 17,
+        "contains_numbers": "True",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "True"
+      },
+      "data_type": {
+        "category": "identifier",
+        "detection_method": "name_based",
+        "keywords_matched": [
+          "siret"
+        ]
+      },
+      "missing_patterns_found": [],
+      "enrichment_potential": {
+        "is_enrichable": false,
+        "priority": "FAIBLE",
+        "success_rate": 5,
+        "estimated_gain": 0,
+        "potential_sources": [],
+        "recommendation": "Non enrichissable automatiquement"
+      }
+    },
+    "Nom courant/Dénomination": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 103,
+        "missing_count": 2998,
+        "completion_rate": 3.32,
+        "unique_values": 63,
+        "avg_length": 18.0
+      },
+      "content_analysis": {
+        "sample_values": [
+          "SYED SARAH",
+          "POR PHEAROUN",
+          "POR PHEAROUN",
+          "POR PHEAROUN",
+          "POR PHEAROUN"
+        ],
+        "most_common_value": "POR PHEAROUN",
+        "most_common_count": 11,
+        "contains_numbers": "True",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "company_name",
+        "detection_method": "name_based",
+        "keywords_matched": [
+          "nom"
+        ]
+      },
+      "missing_patterns_found": [
+        "INFORMATION NON-DIFFUSIBLE"
+      ],
+      "enrichment_potential": {
+        "is_enrichable": true,
+        "priority": "CRITIQUE",
+        "success_rate": 70,
+        "estimated_gain": 2098,
+        "potential_sources": [
+          "LinkedIn",
+          "Registres"
+        ],
+        "recommendation": "PRIORITÉ MAXIMALE - Impact très fort"
+      }
+    },
+    "Enseigne": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 4,
+        "missing_count": 3097,
+        "completion_rate": 0.13,
+        "unique_values": 2,
+        "avg_length": 6.2
+      },
+      "content_analysis": {
+        "sample_values": [
+          "MICHEL COUSIN",
+          "A2BR",
+          "A2BR",
+          "A2BR"
+        ],
+        "most_common_value": "A2BR",
+        "most_common_count": 3,
+        "contains_numbers": "True",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "other",
+        "detection_method": "unknown",
+        "keywords_matched": []
+      },
+      "missing_patterns_found": [
+        ""
+      ],
+      "enrichment_potential": {
+        "is_enrichable": false,
+        "priority": "FAIBLE",
+        "success_rate": 10,
+        "estimated_gain": 0,
+        "potential_sources": [],
+        "recommendation": "Non enrichissable automatiquement"
+      }
+    },
+    "Adresse - complément dʼadresse": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 1,
+        "missing_count": 3100,
+        "completion_rate": 0.03,
+        "unique_values": 1,
+        "avg_length": 21.0
+      },
+      "content_analysis": {
+        "sample_values": [
+          "26 Résidence Beausite"
+        ],
+        "most_common_value": "26 Résidence Beausite",
+        "most_common_count": 1,
+        "contains_numbers": "True",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "location",
+        "detection_method": "name_based",
+        "keywords_matched": [
+          "adresse"
+        ]
+      },
+      "missing_patterns_found": [
+        ""
+      ],
+      "enrichment_potential": {
+        "is_enrichable": false,
+        "priority": "FAIBLE",
+        "success_rate": 15,
+        "estimated_gain": 0,
+        "potential_sources": [
+          "APIs"
+        ],
+        "recommendation": "Non enrichissable automatiquement"
+      }
+    },
+    "Adresse - numéro et voie": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 5,
+        "missing_count": 3096,
+        "completion_rate": 0.16,
+        "unique_values": 3,
+        "avg_length": 26.2
+      },
+      "content_analysis": {
+        "sample_values": [
+          "32 Avenue des Frenes",
+          "14 Ter impasse Blondel (Les Tamaris)",
+          "3 cours des 2 Marronniers",
+          "3 cours des 2 Marronniers",
+          "3 cours des 2 Marronniers"
+        ],
+        "most_common_value": "3 cours des 2 Marronniers",
+        "most_common_count": 3,
+        "contains_numbers": "True",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "location",
+        "detection_method": "name_based",
+        "keywords_matched": [
+          "adresse"
+        ]
+      },
+      "missing_patterns_found": [
+        ""
+      ],
+      "enrichment_potential": {
+        "is_enrichable": false,
+        "priority": "FAIBLE",
+        "success_rate": 15,
+        "estimated_gain": 0,
+        "potential_sources": [
+          "APIs"
+        ],
+        "recommendation": "Non enrichissable automatiquement"
+      }
+    },
+    "Adresse - distribution postale": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 0,
+        "missing_count": 3101,
+        "completion_rate": 0.0,
+        "unique_values": 0,
+        "avg_length": 0
+      },
+      "content_analysis": {
+        "sample_values": [],
+        "most_common_value": null,
+        "most_common_count": 0,
+        "contains_numbers": false,
+        "contains_emails": false,
+        "contains_urls": false,
+        "contains_phone": false
+      },
+      "data_type": {
+        "category": "location",
+        "detection_method": "name_based",
+        "keywords_matched": [
+          "adresse"
+        ]
+      },
+      "missing_patterns_found": [
+        ""
+      ],
+      "enrichment_potential": {
+        "is_enrichable": false,
+        "priority": "FAIBLE",
+        "success_rate": 15,
+        "estimated_gain": 0,
+        "potential_sources": [
+          "APIs"
+        ],
+        "recommendation": "Non enrichissable automatiquement"
+      }
+    },
+    "Adresse - CP et commune": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 3101,
+        "missing_count": 0,
+        "completion_rate": 100.0,
+        "unique_values": 23,
+        "avg_length": 21.3
+      },
+      "content_analysis": {
+        "sample_values": [
+          "77144 CHALIFERT",
+          "77135 PONTCARRE",
+          "77400 LAGNY-SUR-MARNE",
+          "77400 SAINT-THIBAULT-DES-VIGNES",
+          "77600 CONCHES-SUR-GONDOIRE"
+        ],
+        "most_common_value": "77600 BUSSY-SAINT-GEORGES",
+        "most_common_count": 862,
+        "contains_numbers": "True",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "location",
+        "detection_method": "name_based",
+        "keywords_matched": [
+          "commune",
+          "adresse"
+        ]
+      },
+      "missing_patterns_found": [],
+      "enrichment_potential": {
+        "is_enrichable": false,
+        "priority": "FAIBLE",
+        "success_rate": 15,
+        "estimated_gain": 0,
+        "potential_sources": [
+          "APIs"
+        ],
+        "recommendation": "Non enrichissable automatiquement"
+      }
+    },
+    "Commune": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 3101,
+        "missing_count": 0,
+        "completion_rate": 100.0,
+        "unique_values": 20,
+        "avg_length": 15.3
+      },
+      "content_analysis": {
+        "sample_values": [
+          "CHALIFERT",
+          "PONTCARRÉ",
+          "LAGNY-SUR-MARNE",
+          "SAINT-THIBAULT-DES-VIGNES",
+          "CONCHES-SUR-GONDOIRE"
+        ],
+        "most_common_value": "BUSSY-SAINT-GEORGES",
+        "most_common_count": 862,
+        "contains_numbers": "False",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "location",
+        "detection_method": "name_based",
+        "keywords_matched": [
+          "commune"
+        ]
+      },
+      "missing_patterns_found": [],
+      "enrichment_potential": {
+        "is_enrichable": false,
+        "priority": "FAIBLE",
+        "success_rate": 15,
+        "estimated_gain": 0,
+        "potential_sources": [
+          "APIs"
+        ],
+        "recommendation": "Non enrichissable automatiquement"
+      }
+    },
+    "Code NAF": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 3101,
+        "missing_count": 0,
+        "completion_rate": 100.0,
+        "unique_values": 181,
+        "avg_length": 5.0
+      },
+      "content_analysis": {
+        "sample_values": [
+          "5320Z",
+          "7490B",
+          "8211Z",
+          "4932Z",
+          "8690F"
+        ],
+        "most_common_value": "9609Z",
+        "most_common_count": 258,
+        "contains_numbers": "True",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "activity",
+        "detection_method": "name_based",
+        "keywords_matched": [
+          "naf"
+        ]
+      },
+      "missing_patterns_found": [],
+      "enrichment_potential": {
+        "is_enrichable": true,
+        "priority": "FAIBLE",
+        "success_rate": 50,
+        "estimated_gain": 0,
+        "potential_sources": [
+          "LinkedIn",
+          "Sites web"
+        ],
+        "recommendation": "Non prioritaire - Peu de valeurs manquantes"
+      }
+    },
+    "Libellé NAF": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 3101,
+        "missing_count": 0,
+        "completion_rate": 100.0,
+        "unique_values": 181,
+        "avg_length": 40.2
+      },
+      "content_analysis": {
+        "sample_values": [
+          "Autres activités de poste et de courrier",
+          "Activités spécialisées, scientifiques et techniques diverses",
+          "Services administratifs combinés de bureau",
+          "Transports de voyageurs par taxis",
+          "Activités de santé humaine non classées ailleurs"
+        ],
+        "most_common_value": "Autres services personnels n.c.a.",
+        "most_common_count": 258,
+        "contains_numbers": "False",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "activity",
+        "detection_method": "name_based",
+        "keywords_matched": [
+          "naf"
+        ]
+      },
+      "missing_patterns_found": [],
+      "enrichment_potential": {
+        "is_enrichable": true,
+        "priority": "FAIBLE",
+        "success_rate": 50,
+        "estimated_gain": 0,
+        "potential_sources": [
+          "LinkedIn",
+          "Sites web"
+        ],
+        "recommendation": "Non prioritaire - Peu de valeurs manquantes"
+      }
+    },
+    "Forme juridique": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 3101,
+        "missing_count": 0,
+        "completion_rate": 100.0,
+        "unique_values": 2,
+        "avg_length": 23.0
+      },
+      "content_analysis": {
+        "sample_values": [
+          "Entrepreneur individuel",
+          "Entrepreneur individuel",
+          "Entrepreneur individuel",
+          "Entrepreneur individuel",
+          "Entrepreneur individuel"
+        ],
+        "most_common_value": "Entrepreneur individuel",
+        "most_common_count": 3099,
+        "contains_numbers": "False",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "identifier",
+        "detection_method": "name_based",
+        "keywords_matched": [
+          "id"
+        ]
+      },
+      "missing_patterns_found": [],
+      "enrichment_potential": {
+        "is_enrichable": false,
+        "priority": "FAIBLE",
+        "success_rate": 5,
+        "estimated_gain": 0,
+        "potential_sources": [],
+        "recommendation": "Non enrichissable automatiquement"
+      }
+    },
+    "Forme juridique agrégée": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 3101,
+        "missing_count": 0,
+        "completion_rate": 100.0,
+        "unique_values": 2,
+        "avg_length": 39.0
+      },
+      "content_analysis": {
+        "sample_values": [
+          "Affaires personnelles personne physique",
+          "Affaires personnelles personne physique",
+          "Affaires personnelles personne physique",
+          "Affaires personnelles personne physique",
+          "Affaires personnelles personne physique"
+        ],
+        "most_common_value": "Affaires personnelles personne physique",
+        "most_common_count": 3099,
+        "contains_numbers": "False",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "identifier",
+        "detection_method": "name_based",
+        "keywords_matched": [
+          "id"
+        ]
+      },
+      "missing_patterns_found": [],
+      "enrichment_potential": {
+        "is_enrichable": false,
+        "priority": "FAIBLE",
+        "success_rate": 5,
+        "estimated_gain": 0,
+        "potential_sources": [],
+        "recommendation": "Non enrichissable automatiquement"
+      }
+    },
+    "Année": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 3101,
+        "missing_count": 0,
+        "completion_rate": 100.0,
+        "unique_values": 1,
+        "avg_length": 4.0
+      },
+      "content_analysis": {
+        "sample_values": [
+          "2025",
+          "2025",
+          "2025",
+          "2025",
+          "2025"
+        ],
+        "most_common_value": "2025",
+        "most_common_count": 3101,
+        "contains_numbers": "True",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "numeric",
+        "detection_method": "content_based",
+        "keywords_matched": [
+          "numeric_pattern"
+        ]
+      },
+      "missing_patterns_found": [],
+      "enrichment_potential": {
+        "is_enrichable": false,
+        "priority": "FAIBLE",
+        "success_rate": 10,
+        "estimated_gain": 0,
+        "potential_sources": [],
+        "recommendation": "Non enrichissable automatiquement"
+      }
+    },
+    "Tranche effectif établissement": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 3101,
+        "missing_count": 0,
+        "completion_rate": 100.0,
+        "unique_values": 3,
+        "avg_length": 16.0
+      },
+      "content_analysis": {
+        "sample_values": [
+          "NN - Non déclaré",
+          "NN - Non déclaré",
+          "NN - Non déclaré",
+          "NN - Non déclaré",
+          "NN - Non déclaré"
+        ],
+        "most_common_value": "NN - Non déclaré",
+        "most_common_count": 3088,
+        "contains_numbers": "True",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "workforce",
+        "detection_method": "name_based",
+        "keywords_matched": [
+          "effectif"
+        ]
+      },
+      "missing_patterns_found": [],
+      "enrichment_potential": {
+        "is_enrichable": false,
+        "priority": "FAIBLE",
+        "success_rate": 10,
+        "estimated_gain": 0,
+        "potential_sources": [],
+        "recommendation": "Non enrichissable automatiquement"
+      }
+    },
+    "Effectif réel établissement": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 3101,
+        "missing_count": 0,
+        "completion_rate": 100.0,
+        "unique_values": 2,
+        "avg_length": 1.0
+      },
+      "content_analysis": {
+        "sample_values": [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        "most_common_value": "0",
+        "most_common_count": 3100,
+        "contains_numbers": "True",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "workforce",
+        "detection_method": "name_based",
+        "keywords_matched": [
+          "effectif"
+        ]
+      },
+      "missing_patterns_found": [],
+      "enrichment_potential": {
+        "is_enrichable": false,
+        "priority": "FAIBLE",
+        "success_rate": 10,
+        "estimated_gain": 0,
+        "potential_sources": [],
+        "recommendation": "Non enrichissable automatiquement"
+      }
+    },
+    "Genre": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 3101,
+        "missing_count": 0,
+        "completion_rate": 100.0,
+        "unique_values": 2,
+        "avg_length": 8.0
+      },
+      "content_analysis": {
+        "sample_values": [
+          "Madame",
+          "Monsieur",
+          "Monsieur",
+          "Monsieur",
+          "Monsieur"
+        ],
+        "most_common_value": "Monsieur",
+        "most_common_count": 3046,
+        "contains_numbers": "False",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "other",
+        "detection_method": "unknown",
+        "keywords_matched": []
+      },
+      "missing_patterns_found": [],
+      "enrichment_potential": {
+        "is_enrichable": false,
+        "priority": "FAIBLE",
+        "success_rate": 10,
+        "estimated_gain": 0,
+        "potential_sources": [],
+        "recommendation": "Non enrichissable automatiquement"
+      }
+    },
+    "Nom": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 3101,
+        "missing_count": 0,
+        "completion_rate": 100.0,
+        "unique_values": 63,
+        "avg_length": 11.8
+      },
+      "content_analysis": {
+        "sample_values": [
+          "SYED",
+          "le directeur",
+          "le directeur",
+          "le directeur",
+          "le directeur"
+        ],
+        "most_common_value": "le directeur",
+        "most_common_count": 3001,
+        "contains_numbers": "False",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "company_name",
+        "detection_method": "name_based",
+        "keywords_matched": [
+          "nom"
+        ]
+      },
+      "missing_patterns_found": [],
+      "enrichment_potential": {
+        "is_enrichable": true,
+        "priority": "FAIBLE",
+        "success_rate": 70,
+        "estimated_gain": 0,
+        "potential_sources": [
+          "LinkedIn",
+          "Registres"
+        ],
+        "recommendation": "Non prioritaire - Peu de valeurs manquantes"
+      }
+    },
+    "Prénom": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 100,
+        "missing_count": 3001,
+        "completion_rate": 3.22,
+        "unique_values": 61,
+        "avg_length": 7.8
+      },
+      "content_analysis": {
+        "sample_values": [
+          "SARAH",
+          "PHEAROUN",
+          "PHEAROUN",
+          "PHEAROUN",
+          "PHEAROUN"
+        ],
+        "most_common_value": "PHEAROUN",
+        "most_common_count": 11,
+        "contains_numbers": "False",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "company_name",
+        "detection_method": "name_based",
+        "keywords_matched": [
+          "nom"
+        ]
+      },
+      "missing_patterns_found": [
+        ""
+      ],
+      "enrichment_potential": {
+        "is_enrichable": true,
+        "priority": "CRITIQUE",
+        "success_rate": 70,
+        "estimated_gain": 2100,
+        "potential_sources": [
+          "LinkedIn",
+          "Registres"
+        ],
+        "recommendation": "PRIORITÉ MAXIMALE - Impact très fort"
+      }
+    },
+    "Date de création établissement": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 3101,
+        "missing_count": 0,
+        "completion_rate": 100.0,
+        "unique_values": 992,
+        "avg_length": 19.0
+      },
+      "content_analysis": {
+        "sample_values": [
+          "2020-10-07 02:00:00",
+          "2023-10-12 02:00:00",
+          "2023-10-10 02:00:00",
+          "2023-10-16 02:00:00",
+          "2023-10-01 02:00:00"
+        ],
+        "most_common_value": "2025-01-01 02:00:00",
+        "most_common_count": 40,
+        "contains_numbers": "True",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "date",
+        "detection_method": "name_based",
+        "keywords_matched": [
+          "date"
+        ]
+      },
+      "missing_patterns_found": [],
+      "enrichment_potential": {
+        "is_enrichable": false,
+        "priority": "FAIBLE",
+        "success_rate": 10,
+        "estimated_gain": 0,
+        "potential_sources": [],
+        "recommendation": "Non enrichissable automatiquement"
+      }
+    },
+    "Date annonce évènement juridique": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 3101,
+        "missing_count": 0,
+        "completion_rate": 100.0,
+        "unique_values": 544,
+        "avg_length": 19.0
+      },
+      "content_analysis": {
+        "sample_values": [
+          "2020-10-20 02:00:00",
+          "2023-10-12 02:00:00",
+          "2023-10-12 02:00:00",
+          "2023-10-12 02:00:00",
+          "2023-10-12 02:00:00"
+        ],
+        "most_common_value": "2024-03-22 02:00:00",
+        "most_common_count": 452,
+        "contains_numbers": "True",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "identifier",
+        "detection_method": "name_based",
+        "keywords_matched": [
+          "id"
+        ]
+      },
+      "missing_patterns_found": [],
+      "enrichment_potential": {
+        "is_enrichable": false,
+        "priority": "FAIBLE",
+        "success_rate": 5,
+        "estimated_gain": 0,
+        "potential_sources": [],
+        "recommendation": "Non enrichissable automatiquement"
+      }
+    },
+    "Date évènement juridique": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 3101,
+        "missing_count": 0,
+        "completion_rate": 100.0,
+        "unique_values": 1070,
+        "avg_length": 19.0
+      },
+      "content_analysis": {
+        "sample_values": [
+          "2020-10-07 02:00:00",
+          "2023-10-12 02:00:00",
+          "2023-10-10 02:00:00",
+          "2023-10-16 02:00:00",
+          "2023-10-01 02:00:00"
+        ],
+        "most_common_value": "2025-01-01 02:00:00",
+        "most_common_count": 41,
+        "contains_numbers": "True",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "identifier",
+        "detection_method": "name_based",
+        "keywords_matched": [
+          "id"
+        ]
+      },
+      "missing_patterns_found": [],
+      "enrichment_potential": {
+        "is_enrichable": false,
+        "priority": "FAIBLE",
+        "success_rate": 5,
+        "estimated_gain": 0,
+        "potential_sources": [],
+        "recommendation": "Non enrichissable automatiquement"
+      }
+    },
+    "Libellé type évènement juridique": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 3101,
+        "missing_count": 0,
+        "completion_rate": 100.0,
+        "unique_values": 14,
+        "avg_length": 13.3
+      },
+      "content_analysis": {
+        "sample_values": [
+          "Création",
+          "Création",
+          "Création",
+          "Création",
+          "Création"
+        ],
+        "most_common_value": "Création",
+        "most_common_count": 1742,
+        "contains_numbers": "False",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "identifier",
+        "detection_method": "name_based",
+        "keywords_matched": [
+          "id"
+        ]
+      },
+      "missing_patterns_found": [],
+      "enrichment_potential": {
+        "is_enrichable": false,
+        "priority": "FAIBLE",
+        "success_rate": 5,
+        "estimated_gain": 0,
+        "potential_sources": [],
+        "recommendation": "Non enrichissable automatiquement"
+      }
+    },
+    "Provenance": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 3101,
+        "missing_count": 0,
+        "completion_rate": 100.0,
+        "unique_values": 12,
+        "avg_length": 13.3
+      },
+      "content_analysis": {
+        "sample_values": [
+          "non attribué",
+          "non attribué",
+          "non attribué",
+          "non attribué",
+          "non attribué"
+        ],
+        "most_common_value": "non attribué",
+        "most_common_count": 2883,
+        "contains_numbers": "True",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "other",
+        "detection_method": "unknown",
+        "keywords_matched": []
+      },
+      "missing_patterns_found": [],
+      "enrichment_potential": {
+        "is_enrichable": false,
+        "priority": "FAIBLE",
+        "success_rate": 10,
+        "estimated_gain": 0,
+        "potential_sources": [],
+        "recommendation": "Non enrichissable automatiquement"
+      }
+    },
+    "Texte annonce évènement juridique": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 862,
+        "missing_count": 2239,
+        "completion_rate": 27.8,
+        "unique_values": 662,
+        "avg_length": 156.0
+      },
+      "content_analysis": {
+        "sample_values": [
+          "- Création\n- Immatriculation d'une personne physique suite à création d'un établissement principal\n- Création",
+          "Vient de JOUARRE (77238)\nSiret établissement prédécesseur : 85238213400017\nSiret établissement successeur : 85238213400025\nContinuité économique : oui\nTransfert siège : oui",
+          "Vient de CHANTELOUP-EN-BRIE (77085)\nSiret établissement prédécesseur : 85047534400014\nSiret établissement successeur : 85047534400022\nContinuité économique : oui\nTransfert siège : non",
+          "Modification de l'activité principale de l'établissement\nAncien NAF : 4791A - Vente à distance sur catalogue général\nNouveau NAF : 7410Z - Activités spécialisées de design",
+          "Modification de l'activité principale de l'établissement\nAncien NAF : 7410Z - Activités spécialisées de design\nNouveau NAF : 6630Z - Gestion de fonds"
+        ],
+        "most_common_value": "Modification du nom de l'entreprise\nAncien nom : [ND]\nNouveau nom : [ND]",
+        "most_common_count": 77,
+        "contains_numbers": "True",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "True"
+      },
+      "data_type": {
+        "category": "identifier",
+        "detection_method": "name_based",
+        "keywords_matched": [
+          "id"
+        ]
+      },
+      "missing_patterns_found": [
+        ""
+      ],
+      "enrichment_potential": {
+        "is_enrichable": false,
+        "priority": "FAIBLE",
+        "success_rate": 5,
+        "estimated_gain": 0,
+        "potential_sources": [],
+        "recommendation": "Non enrichissable automatiquement"
+      }
+    },
+    "Type de la source": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 3101,
+        "missing_count": 0,
+        "completion_rate": 100.0,
+        "unique_values": 2,
+        "avg_length": 5.0
+      },
+      "content_analysis": {
+        "sample_values": [
+          "BODACC",
+          "INSEE",
+          "INSEE",
+          "INSEE",
+          "INSEE"
+        ],
+        "most_common_value": "INSEE",
+        "most_common_count": 3095,
+        "contains_numbers": "False",
+        "contains_emails": "False",
+        "contains_urls": "False",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "other",
+        "detection_method": "unknown",
+        "keywords_matched": []
+      },
+      "missing_patterns_found": [],
+      "enrichment_potential": {
+        "is_enrichable": false,
+        "priority": "FAIBLE",
+        "success_rate": 10,
+        "estimated_gain": 0,
+        "potential_sources": [],
+        "recommendation": "Non enrichissable automatiquement"
+      }
+    },
+    "Site Web établissement": {
+      "statistics": {
+        "total_values": 3101,
+        "present_count": 5,
+        "missing_count": 3096,
+        "completion_rate": 0.16,
+        "unique_values": 3,
+        "avg_length": 60.6
+      },
+      "content_analysis": {
+        "sample_values": [
+          "www.avendrealouer.fr/professionnels/lagny-sur-marne-77/julien-brunel-iad-france/loc-101-3747",
+          "www.avendrealouer.fr/professionnels/lagny-sur-marne-77/julien-brunel-iad-france/loc-101-3747",
+          "www.avendrealouer.fr/professionnels/lagny-sur-marne-77/julien-brunel-iad-france/loc-101-3747",
+          "sophiedano.com",
+          "www.pewem.com"
+        ],
+        "most_common_value": "www.avendrealouer.fr/professionnels/lagny-sur-marne-77/julien-brunel-iad-france/loc-101-3747",
+        "most_common_count": 3,
+        "contains_numbers": "True",
+        "contains_emails": "False",
+        "contains_urls": "True",
+        "contains_phone": "False"
+      },
+      "data_type": {
+        "category": "website",
+        "detection_method": "name_based",
+        "keywords_matched": [
+          "site",
+          "web"
+        ]
+      },
+      "missing_patterns_found": [
+        ""
+      ],
+      "enrichment_potential": {
+        "is_enrichable": true,
+        "priority": "CRITIQUE",
+        "success_rate": 75,
+        "estimated_gain": 2322,
+        "potential_sources": [
+          "LinkedIn",
+          "Google",
+          "DuckDuckGo"
+        ],
+        "recommendation": "PRIORITÉ MAXIMALE - Impact très fort"
+      }
+    }
+  },
+  "enrichment_opportunities": {
+    "Nom courant/Dénomination": {
+      "missing_count": 2998,
+      "completion_rate": 3.32,
+      "priority": "CRITIQUE",
+      "estimated_gain": 2098,
+      "success_rate": 70,
+      "sources": [
+        "LinkedIn",
+        "Registres"
+      ],
+      "recommendation": "PRIORITÉ MAXIMALE - Impact très fort"
+    },
+    "Prénom": {
+      "missing_count": 3001,
+      "completion_rate": 3.22,
+      "priority": "CRITIQUE",
+      "estimated_gain": 2100,
+      "success_rate": 70,
+      "sources": [
+        "LinkedIn",
+        "Registres"
+      ],
+      "recommendation": "PRIORITÉ MAXIMALE - Impact très fort"
+    },
+    "Site Web établissement": {
+      "missing_count": 3096,
+      "completion_rate": 0.16,
+      "priority": "CRITIQUE",
+      "estimated_gain": 2322,
+      "success_rate": 75,
+      "sources": [
+        "LinkedIn",
+        "Google",
+        "DuckDuckGo"
+      ],
+      "recommendation": "PRIORITÉ MAXIMALE - Impact très fort"
+    }
+  },
+  "summary": {
+    "total_columns": 27,
+    "columns_with_missing_data": 8,
+    "most_complete_column": "Numéro de fiche",
+    "least_complete_column": "Adresse - distribution postale",
+    "top_enrichment_priorities": [
+      "Site Web établissement",
+      "Prénom",
+      "Nom courant/Dénomination"
+    ]
+  }
+}
